@@ -46,14 +46,20 @@ endif()
 target_link_libraries(sokol PUBLIC cimgui)
 target_include_directories(sokol INTERFACE sokol)
 
+#=== EXECUTABLE: DaisySP
+# must be built in ../DaisySP
+#   lib in ../DaisySP/build/libDaisySP.a
+#   incs in ../DaisySP/Source/daisysp.h
+
 #=== EXECUTABLE: demo
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
     add_executable(demo WIN32 demo.c)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT demo)
 else()
-    add_executable(demo demo.c)
+    add_executable(demo demo.c demo.cpp demo.h)
 endif()
-target_link_libraries(demo sokol)
+target_include_directories(demo PRIVATE ${CMAKE_SOURCE_DIR}/../DaisySP/Source)
+target_link_libraries(demo sokol ${CMAKE_SOURCE_DIR}/../DaisySP/build/libDaisySP.a)
 
 # Emscripten-specific linker options
 if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
