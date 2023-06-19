@@ -34,6 +34,7 @@ static void init(void)
         .stream_cb = stream_cb,
         .logger.func = slog_func,
     });
+    daisy_init(saudio_sample_rate());
 }
 
 static void frame(void)

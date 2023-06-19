@@ -11,3 +11,5 @@ Cloned DaisySP  git clone https://github.com/electro-smith/DaisySP into ../Daisy
 Did standard cmake build and got a static library in build/libDaisySP.a
 Adjusted CMakeLists.txt to build.  
 Needed to add a demo.cpp for libDaisySP since it is C++ based.
+
+Got basic DaisySP osc working.
