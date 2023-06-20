@@ -1,7 +1,10 @@
 # Notes
 * Based on https://github.com/floooh/cimgui-sokol-starterkit
 * Requires some libraries in `..`:
-  * `git clone https://github.com/electro-smith/DaisySP`
+  * `git clone https://github.com/electro-smith/DaisySP` and build 
+  * On Windows DaisySP file `adsr.h` needed a `#define _USE_MATH_DEFINES` before include math.h
+  * On Windows use RelWithDebInfo target. (FIXME)
+* Optional libraries in `..` if running `update_deps.sh` 
   * `git clone git@github.com:floooh/sokol.git`
   * `git clone --recursive https://github.com/cimgui/cimgui.git`
 # Log
@@ -22,6 +25,8 @@ Updates dear imgui, v1.89.5 -> v1.89.6
 
 Updates sokol_gfx.h
 
+Works on Windows 11 & Linux
+
 ## Monday June 19, 2023
 
 Looking for a easy-to-use application framework to support a Daisy SP synth.  Found https://github.com/floooh/sokol and https://github.com/floooh/cimgui-sokol-starterkit
@@ -35,7 +40,7 @@ Needed to add a `demo.cpp` for libDaisySP since it is C++ based.
 
 Got basic DaisySP osc working.
 
-On Windows DaisySP file `adsr.h` needed a `_USE_MATH_DEFINES` before include math.h
+On Windows DaisySP file `adsr.h` needed a `#define _USE_MATH_DEFINES` before include math.h
 
 I'm putting windows library in `DaisySP\build\RelWithDebInfo\DaisySP.lib`
 
