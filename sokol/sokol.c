@@ -20,3 +20,5 @@
 #include "sokol_imgui.h"
 #define SOKOL_AUDIO_IMPL
 #include "sokol_audio.h"
+#define SOKOL_GL_IMPL
+#include "sokol_gl.h"

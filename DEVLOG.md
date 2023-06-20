@@ -27,6 +27,8 @@ Updates sokol_gfx.h
 
 Works on Windows 11 & Linux
 
+Wanted to add some basic graphics.  Did that with `sokol_gl.h`
+
 ## Monday June 19, 2023
 
 Looking for a easy-to-use application framework to support a Daisy SP synth.  Found https://github.com/floooh/sokol and https://github.com/floooh/cimgui-sokol-starterkit

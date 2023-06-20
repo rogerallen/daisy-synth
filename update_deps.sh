@@ -5,6 +5,7 @@ cp ../sokol/sokol_glue.h sokol/
 cp ../sokol/util/sokol_imgui.h sokol/
 # added 
 cp ../sokol/sokol_audio.h sokol/
+cp ../sokol/util/sokol_gl.h sokol/
 
 # removed "fips-cimgui/"
 cp ../cimgui/cimgui.cpp cimgui/

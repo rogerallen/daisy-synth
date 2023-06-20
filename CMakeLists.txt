@@ -27,7 +27,8 @@ set(SOKOL_HEADERS
     sokol/sokol_app.h
     sokol/sokol_imgui.h
     sokol/sokol_glue.h
-    sokol/sokol_audio.h)
+    sokol/sokol_audio.h
+    sokol/sokol_gl.h)
 if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
     add_library(sokol STATIC sokol/sokol.c ${SOKOL_HEADERS})
     target_compile_options(sokol PRIVATE -x objective-c)
