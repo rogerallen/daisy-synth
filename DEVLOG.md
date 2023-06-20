@@ -13,3 +13,9 @@ Adjusted CMakeLists.txt to build.
 Needed to add a demo.cpp for libDaisySP since it is C++ based.
 
 Got basic DaisySP osc working.
+
+On Windows DaisySP file adsr.h needed a _USE_MATH_DEFINES before include math.h
+
+I'm putting library in DaisySP\build\RelWithDebInfo\DaisySP.lib
+
+But it works!
