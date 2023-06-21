@@ -4,11 +4,15 @@
   * `git clone https://github.com/electro-smith/DaisySP` and build 
   * On Windows DaisySP file `adsr.h` needed a `#define _USE_MATH_DEFINES` before include math.h
   * On Windows use RelWithDebInfo target. (FIXME)
-* Optional libraries in `..` if running `update_deps.sh` 
+* Optional libraries in `..` if running `update_deps.sh`.  Not all repos need to do this.
   * `git clone git@github.com:floooh/sokol.git`
   * `git clone --recursive https://github.com/cimgui/cimgui.git`
 # Log
 Most recent on top.
+## Wedneday June 21, 2023
+
+Add very basic note control and keyboard drawing.
+
 ## Tuesday June 20, 2023
 
 Noticed this "I'm not planning to do frequent updates to newer versions of those 

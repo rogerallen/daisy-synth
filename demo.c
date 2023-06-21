@@ -1,6 +1,4 @@
 //------------------------------------------------------------------------------
-//  Simple C99 cimgui+sokol starter project for Win32, Linux and macOS.
-//------------------------------------------------------------------------------
 #include "sokol_app.h"
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
@@ -16,6 +14,7 @@
 static struct {
     sg_pass_action pass_action;
     sgl_pipeline pip_3d;
+    float cur_amplitude;
 } state;
 
 static void init(void)
@@ -55,15 +54,22 @@ static void init(void)
     state.pass_action =
         (sg_pass_action){.colors[0] = {.load_action = SG_LOADACTION_CLEAR,
                                        .clear_value = {0.0f, 0.5f, 1.0f, 1.0}}};
+
+    state.cur_amplitude = 0.05;
 }
 
-static void draw_triangle(void)
+static void draw_key(int pitch, bool active)
 {
+    float cx = (pitch - 64.0) / 32.0;
+    float dx = 1.0 / 68.0;
+    int top_color = active ? 200 : 100;
+    int bot_color = active ? 255 : 128;
     sgl_defaults();
-    sgl_begin_triangles();
-    sgl_v2f_c3b(0.0f, 0.5f, 255, 0, 0);
-    sgl_v2f_c3b(-0.5f, -0.5f, 0, 0, 255);
-    sgl_v2f_c3b(0.5f, -0.5f, 0, 255, 0);
+    sgl_begin_quads();
+    sgl_v2f_c3b(cx - dx, 0.5f, top_color, top_color, top_color);
+    sgl_v2f_c3b(cx - dx, -0.5f, bot_color, bot_color, bot_color);
+    sgl_v2f_c3b(cx + dx, -0.5f, bot_color, bot_color, bot_color);
+    sgl_v2f_c3b(cx + dx, 0.5f, top_color, top_color, top_color);
     sgl_end();
 }
 
@@ -80,26 +86,21 @@ static void frame(void)
     igSetNextWindowPos((ImVec2){10, 10}, ImGuiCond_Once, (ImVec2){0, 0});
     igSetNextWindowSize((ImVec2){400, 100}, ImGuiCond_Once);
     igBegin("Controls", 0, ImGuiWindowFlags_None);
-    igColorEdit3("Background", &state.pass_action.colors[0].clear_value.r,
-                 ImGuiColorEditFlags_None);
+    igText("Press a key to make a Sound.");
+    // igColorEdit3("Background",
+    //              &state.pass_action.colors[0].clear_value.r,
+    //              ImGuiColorEditFlags_None);
+    igLabelText("Pitch", "%d", get_pitch());
+    igSliderFloat("Amplitude", &state.cur_amplitude, 0.0, 1.0, "%.3f",
+                  ImGuiSliderFlags_None);
     igEnd();
     /*=== UI CODE ENDS HERE ===*/
 
     // sgl code start here
-    // compute viewport rectangles so that the views are horizontally
-    // centered and keep a 1:1 aspect ratio
-    const int dw = sapp_width();
-    const int dh = sapp_height();
-    const int ww = dh / 2; // not a bug
-    const int hh = dh / 2;
-    const int x0 = dw / 2 - hh;
-    const int x1 = dw / 2;
-    const int y0 = 0;
-    const int y1 = dh / 2;
-    // all sokol-gl functions except sgl_draw() can be called anywhere in the
-    // frame
-    sgl_viewport(x0, y0, ww, hh, true);
-    draw_triangle();
+    sgl_viewport(0, 0, sapp_width(), sapp_height(), true);
+    for (int p = 3 * 12 + 12; p <= 3 * 12 + 40; p++) {
+        draw_key(p, p == get_pitch());
+    }
 
     sg_begin_default_pass(&state.pass_action, sapp_width(), sapp_height());
     sgl_draw();
@@ -182,7 +183,7 @@ static int key_code_to_pitch(sapp_keycode kc)
     case SAPP_KEYCODE_E:
         pitch = 28;
         break;
-    case SAPP_KEYCODE_RIGHT_SHIFT:
+    case SAPP_KEYCODE_R:
         pitch = 29;
         break;
     case SAPP_KEYCODE_5:
@@ -219,8 +220,9 @@ static int key_code_to_pitch(sapp_keycode kc)
         pitch = 40;
         break;
     }
+    // shift 3 octaves up
     if (pitch > 0) {
-        pitch += 2 * 12;
+        pitch += 3 * 12;
     }
     return pitch;
 }
@@ -228,19 +230,25 @@ static int key_code_to_pitch(sapp_keycode kc)
 static void event(const sapp_event *ev)
 {
     bool handled = simgui_handle_event(ev);
-    if (!handled) {
+    if (true) { // !handled) {
         if (ev->type == SAPP_EVENTTYPE_KEY_DOWN) {
             if (ev->key_code == SAPP_KEYCODE_ESCAPE) {
                 sapp_quit();
             }
             else {
                 int pitch = key_code_to_pitch(ev->key_code);
-                printf("Note On  %d\n", pitch);
+                if (pitch > 0) {
+                    // printf("Note On  %d\n", pitch);
+                    note_on(pitch, state.cur_amplitude);
+                }
             }
         }
         else if (ev->type == SAPP_EVENTTYPE_KEY_UP) {
             int pitch = key_code_to_pitch(ev->key_code);
-            printf("Note Off %d\n", pitch);
+            if (pitch > 0) {
+                // printf("Note Off %d\n", pitch);
+                note_off(pitch);
+            }
         }
     }
 }
