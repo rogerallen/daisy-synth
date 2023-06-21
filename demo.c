@@ -115,6 +115,116 @@ static void cleanup(void)
     saudio_shutdown();
 }
 
+// return midi pitch for keyboard events.  return -1 for no match
+static int key_code_to_pitch(sapp_keycode kc)
+{
+    int pitch = -1;
+    switch (kc) {
+    case SAPP_KEYCODE_Z:
+        pitch = 12;
+        break;
+    case SAPP_KEYCODE_S:
+        pitch = 13;
+        break;
+    case SAPP_KEYCODE_X:
+        pitch = 14;
+        break;
+    case SAPP_KEYCODE_D:
+        pitch = 15;
+        break;
+    case SAPP_KEYCODE_C:
+        pitch = 16;
+        break;
+    case SAPP_KEYCODE_V:
+        pitch = 17;
+        break;
+    case SAPP_KEYCODE_G:
+        pitch = 18;
+        break;
+    case SAPP_KEYCODE_B:
+        pitch = 19;
+        break;
+    case SAPP_KEYCODE_H:
+        pitch = 20;
+        break;
+    case SAPP_KEYCODE_N:
+        pitch = 21;
+        break;
+    case SAPP_KEYCODE_J:
+        pitch = 22;
+        break;
+    case SAPP_KEYCODE_M:
+        pitch = 23;
+        break;
+    case SAPP_KEYCODE_COMMA:
+        pitch = 24;
+        break;
+    case SAPP_KEYCODE_L:
+        pitch = 25;
+        break;
+    case SAPP_KEYCODE_PERIOD:
+        pitch = 26;
+        break;
+
+        // upper keyboard
+    case SAPP_KEYCODE_Q:
+        pitch = 24;
+        break;
+    case SAPP_KEYCODE_2:
+        pitch = 25;
+        break;
+    case SAPP_KEYCODE_W:
+        pitch = 26;
+        break;
+    case SAPP_KEYCODE_3:
+        pitch = 27;
+        break;
+    case SAPP_KEYCODE_E:
+        pitch = 28;
+        break;
+    case SAPP_KEYCODE_RIGHT_SHIFT:
+        pitch = 29;
+        break;
+    case SAPP_KEYCODE_5:
+        pitch = 30;
+        break;
+    case SAPP_KEYCODE_T:
+        pitch = 31;
+        break;
+    case SAPP_KEYCODE_6:
+        pitch = 32;
+        break;
+    case SAPP_KEYCODE_Y:
+        pitch = 33;
+        break;
+    case SAPP_KEYCODE_7:
+        pitch = 34;
+        break;
+    case SAPP_KEYCODE_U:
+        pitch = 35;
+        break;
+    case SAPP_KEYCODE_I:
+        pitch = 36;
+        break;
+    case SAPP_KEYCODE_9:
+        pitch = 37;
+        break;
+    case SAPP_KEYCODE_O:
+        pitch = 38;
+        break;
+    case SAPP_KEYCODE_0:
+        pitch = 39;
+        break;
+    case SAPP_KEYCODE_P:
+        pitch = 40;
+        break;
+    }
+    if (pitch > 0) {
+        pitch += 2 * 12;
+    }
+    return pitch;
+}
+
 static void event(const sapp_event *ev)
 {
     bool handled = simgui_handle_event(ev);
@@ -123,6 +233,14 @@ static void event(const sapp_event *ev)
             if (ev->key_code == SAPP_KEYCODE_ESCAPE) {
                 sapp_quit();
             }
+            else {
+                int pitch = key_code_to_pitch(ev->key_code);
+                printf("Note On  %d\n", pitch);
+            }
+        }
+        else if (ev->type == SAPP_EVENTTYPE_KEY_UP) {
+            int pitch = key_code_to_pitch(ev->key_code);
+            printf("Note Off %d\n", pitch);
         }
     }
 }
