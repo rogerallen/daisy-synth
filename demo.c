@@ -114,7 +114,17 @@ static void cleanup(void)
 
 static void event(const sapp_event *ev)
 {
-    simgui_handle_event(ev);
+    bool handled = simgui_handle_event(ev);
+    if (!handled)
+    {
+        if (ev->type == SAPP_EVENTTYPE_KEY_DOWN)
+        {
+            if (ev->key_code == SAPP_KEYCODE_ESCAPE)
+            {
+                sapp_quit();
+            }
+        }
+    }
 }
 
 sapp_desc sokol_main(int argc, char *argv[])
