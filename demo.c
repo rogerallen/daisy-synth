@@ -3,18 +3,17 @@
 //------------------------------------------------------------------------------
 #include "sokol_app.h"
 #include "sokol_gfx.h"
-#include "sokol_log.h"
 #include "sokol_glue.h"
+#include "sokol_log.h"
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include "cimgui.h"
-#include "sokol_imgui.h"
+#include "demo.h"
 #include "sokol_audio.h"
 #include "sokol_gl.h"
+#include "sokol_imgui.h"
 #include <assert.h>
-#include "demo.h"
 
-static struct
-{
+static struct {
     sg_pass_action pass_action;
     sgl_pipeline pip_3d;
 } state;
@@ -45,15 +44,17 @@ static void init(void)
     // these are all filled in by sokol-gl
     state.pip_3d = sgl_make_pipeline(&(sg_pipeline_desc){
         .cull_mode = SG_CULLMODE_BACK,
-        .depth = {
-            .write_enabled = true,
-            .compare = SG_COMPAREFUNC_LESS_EQUAL,
-        },
+        .depth =
+            {
+                .write_enabled = true,
+                .compare = SG_COMPAREFUNC_LESS_EQUAL,
+            },
     });
 
     // initial clear color
-    state.pass_action = (sg_pass_action){
-        .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {0.0f, 0.5f, 1.0f, 1.0}}};
+    state.pass_action =
+        (sg_pass_action){.colors[0] = {.load_action = SG_LOADACTION_CLEAR,
+                                       .clear_value = {0.0f, 0.5f, 1.0f, 1.0}}};
 }
 
 static void draw_triangle(void)
@@ -79,7 +80,8 @@ static void frame(void)
     igSetNextWindowPos((ImVec2){10, 10}, ImGuiCond_Once, (ImVec2){0, 0});
     igSetNextWindowSize((ImVec2){400, 100}, ImGuiCond_Once);
     igBegin("Controls", 0, ImGuiWindowFlags_None);
-    igColorEdit3("Background", &state.pass_action.colors[0].clear_value.r, ImGuiColorEditFlags_None);
+    igColorEdit3("Background", &state.pass_action.colors[0].clear_value.r,
+                 ImGuiColorEditFlags_None);
     igEnd();
     /*=== UI CODE ENDS HERE ===*/
 
@@ -94,7 +96,8 @@ static void frame(void)
     const int x1 = dw / 2;
     const int y0 = 0;
     const int y1 = dh / 2;
-    // all sokol-gl functions except sgl_draw() can be called anywhere in the frame
+    // all sokol-gl functions except sgl_draw() can be called anywhere in the
+    // frame
     sgl_viewport(x0, y0, ww, hh, true);
     draw_triangle();
 
@@ -115,12 +118,9 @@ static void cleanup(void)
 static void event(const sapp_event *ev)
 {
     bool handled = simgui_handle_event(ev);
-    if (!handled)
-    {
-        if (ev->type == SAPP_EVENTTYPE_KEY_DOWN)
-        {
-            if (ev->key_code == SAPP_KEYCODE_ESCAPE)
-            {
+    if (!handled) {
+        if (ev->type == SAPP_EVENTTYPE_KEY_DOWN) {
+            if (ev->key_code == SAPP_KEYCODE_ESCAPE) {
                 sapp_quit();
             }
         }
