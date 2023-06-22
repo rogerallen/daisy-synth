@@ -65,7 +65,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL Linux)
     target_link_libraries(demo sokol ${DAISYSP_DIR}/build/libDaisySP.a)
 endif()
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
-    target_link_libraries(demo sokol ${DAISYSP_DIR}/build/${CMAKE_BUILD_TYPE}/DaisySP.lib)
+    target_link_libraries(demo sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
 endif()
 
 # Emscripten-specific linker options
