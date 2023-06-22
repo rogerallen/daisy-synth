@@ -55,65 +55,71 @@ static void init(void)
         (sg_pass_action){.colors[0] = {.load_action = SG_LOADACTION_CLEAR,
                                        .clear_value = {0.0f, 0.5f, 1.0f, 1.0}}};
 
+    // other state
     state.cur_amplitude = 0.05;
 }
 
-// draw a proper keyboard 
+// draw a proper keyboard
 // https://bootcamp.uxdesign.cc/drawing-a-flat-piano-keyboard-in-illustrator-de07c74a64c6?gi=866815891348
-// a single octave is divided into seven diatonic steps and twelve chromatic steps. 
-// our range is 48/C3 to 76/E5.  But we will calculate things based on 3 octaves [48,84)
-// or 21 diatonic steps and 36 chromatic steps
-static void draw_key(int pitch, bool active)
+// a single octave is divided into seven diatonic steps and twelve chromatic
+// steps. our range is 48/C3 to 76/E5.  But we will calculate things based on 3
+// octaves [48,84) or 21 diatonic steps and 36 chromatic steps
+// FIXME depth should work & we should not need draw_white_keys set
+static void draw_key(int pitch, bool active, bool draw_white_keys)
 {
     // x ranges from -1 to 1
-    float margin_x = 0.15;
+    float margin_x = 0.1;
     float start_x = -1 + margin_x;
     float end_x = 1 - margin_x;
-    // 7*2+2 white keys fit between start_x & end_x
-    float white_dx = (end_x - start_x) / (7*2+2);
+    // 7*2+3 white keys fit between start_x & end_x
+    float white_dx = (end_x - start_x) / (7 * 2 + 3);
     // 12 black keys fit within 7 white keys
-    float black_dx = 7*white_dx/12;
+    float black_dx = 7 * white_dx / 12;
     // 48                     60                     72                     84
     // C                      C                      C                      C
-    // w,b,w,b,w,w,b,w,b,w,b, w,b,w,b,w,w,b,w,b,w,b, w,b,w,b,w,w,b,w,b,w,b, 
-    int white_key_idx_ary[] = {0,-1,1,-1,2,3,-1,4,-1,5,-1,6, 7+0,-1,7+1,-1,7+2,7+3,-1,7+4,-1,7+5,-1,7+6,  14+0,-1,14+1,-1,14+2,14+3,-1,14+4,-1,14+5,-1,14+6 };
-    int black_key_idx_ary[] = {-1,1,-1,3,-1,-1,6,-1,8,-1,10, -1,12+1,-1,12+3,-1,-1,12+6,-1,12+8,-1,12+10, -1,24+1,-1,24+3,-1,-1,24+6,-1,24+8,-1,24+10};
+    // w,b,w,b,w,w,b,w,b,w,b, w,b,w,b,w,w,b,w,b,w,b, w,b,w,b,w,w,b,w,b,w,b,
+    int white_key_idx_ary[] = {
+        0,  -1,     1,      -1,    2,      3,     -1,     4,     -1,
+        5,  -1,     6,      7 + 0, -1,     7 + 1, -1,     7 + 2, 7 + 3,
+        -1, 7 + 4,  -1,     7 + 5, -1,     7 + 6, 14 + 0, -1,    14 + 1,
+        -1, 14 + 2, 14 + 3, -1,    14 + 4, -1,    14 + 5, -1,    14 + 6};
+    int black_key_idx_ary[] = {
+        -1, 1,      -1, 3,      -1, -1, 6,      -1, 8,      -1, 10,      -1,
+        -1, 12 + 1, -1, 12 + 3, -1, -1, 12 + 6, -1, 12 + 8, -1, 12 + 10, -1,
+        -1, 24 + 1, -1, 24 + 3, -1, -1, 24 + 6, -1, 24 + 8, -1, 24 + 10, -1};
     int p = pitch - 48;
-    assert(p < len(white_key_idx_ary));
+    assert(sizeof(white_key_idx_ary) == sizeof(black_key_idx_ary));
+    assert(p < sizeof(white_key_idx_ary));
     assert(p >= 0);
     int white_key_idx = white_key_idx_ary[p];
     int black_key_idx = black_key_idx_ary[p];
-    printf("wki=%d bki=%d\n", white_key_idx, black_key_idx);
     // one should be -1, the other should be 0 greater
     assert(((white_key_idx >= 0) && (black_key_idx < 0)) ||
            ((white_key_idx < 0) && (black_key_idx >= 0)));
-    if(white_key_idx >= 0) {
-        float x = start_x + white_key_idx*white_dx;
-        float dx = white_dx*0.9;
-        int top_color = active ? 200 : 100;
-        int bot_color = active ? 255 : 128;
-        sgl_defaults();
+    if (white_key_idx >= 0 && draw_white_keys) {
+        float x = start_x + white_key_idx * white_dx;
+        float dx = white_dx * 0.95;
+        int top_color = active ? 200 : 150;
+        int bot_color = active ? 255 : 200;
         sgl_begin_quads();
-        sgl_v3f_c3b(x,      0.5f, 0.9f, top_color, top_color, top_color);
-        sgl_v3f_c3b(x,      0.0f, 0.9f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, 0.0f, 0.9f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, 0.5f, 0.9f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x, -0.0f, 0.9f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x, 0.5f, 0.9f, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x + dx, 0.5f, 0.9f, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x + dx, -0.0f, 0.9f, top_color, top_color, top_color);
         sgl_end();
     }
-    else {
-        float x = start_x + black_key_idx*black_dx;
-        float dx = black_dx*0.9;
-        int top_color = active ? 80 : 40;
-        int bot_color = active ? 100 : 50;
-        sgl_defaults();
+    else if (black_key_idx >= 0 && !draw_white_keys) {
+        float x = start_x + black_key_idx * black_dx;
+        float dx = black_dx * 1.0;
+        int top_color = active ? 120 : 40;
+        int bot_color = active ? 150 : 50;
         sgl_begin_quads();
-        sgl_v3f_c3b(x,       0.2f, 0.5f, top_color, top_color, top_color);
-        sgl_v3f_c3b(x,      -0.5f, 0.5f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, -0.5f, 0.5f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx,  0.2f, 0.5f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x, 0.2f, 0.5f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x, 0.5f, 0.5f, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x + dx, 0.5f, 0.5f, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x + dx, 0.2f, 0.5f, top_color, top_color, top_color);
         sgl_end();
     }
-
 }
 
 static void frame(void)
@@ -140,11 +146,32 @@ static void frame(void)
     /*=== UI CODE ENDS HERE ===*/
 
     // sgl code start here
+    sgl_defaults();
     sgl_viewport(0, 0, sapp_width(), sapp_height(), true);
+#if 0
+    // FIXME I cannot get depth test working...
+    sgl_push_pipeline();
+    sgl_load_pipeline(state.pip_3d);
+    sgl_matrix_mode_projection();
+    sgl_ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    sgl_matrix_mode_modelview();
+#endif
     for (int p = 3 * 12 + 12; p <= 3 * 12 + 40; p++) {
-        draw_key(p, p == get_pitch());
+        draw_key(p, p == get_pitch(), true);
+    }
+    // FIXME draw black keys second since depth test is failing
+    for (int p = 3 * 12 + 12; p <= 3 * 12 + 40; p++) {
+        draw_key(p, p == get_pitch(), false);
+    }
+#if 0
+    sgl_pop_pipeline();
+#endif
+    int err = sgl_error();
+    if (err != SGL_NO_ERROR) {
+        printf("SGL_ERROR = %d\n", err);
     }
 
+    // default pass
     sg_begin_default_pass(&state.pass_action, sapp_width(), sapp_height());
     sgl_draw();
     simgui_render();
@@ -249,7 +276,7 @@ static int key_code_to_pitch(sapp_keycode kc)
         pitch = 71;
         break;
     case SAPP_KEYCODE_I:
-        pitch = 72;  // C5
+        pitch = 72; // C5
         break;
     case SAPP_KEYCODE_9:
         pitch = 73;
@@ -261,7 +288,7 @@ static int key_code_to_pitch(sapp_keycode kc)
         pitch = 75;
         break;
     case SAPP_KEYCODE_P:
-        pitch = 76;  // E5
+        pitch = 76; // E5
         break;
     }
     return pitch;

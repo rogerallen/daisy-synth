@@ -16,6 +16,8 @@ Add very basic note control and keyboard drawing.
 
 Moved basic code into demo directory.  Different synths can be in different directories.
 
+Added nice keyboard but can't get depth enabled.  FIXME
+
 ## Tuesday June 20, 2023
 
 Noticed this "I'm not planning to do frequent updates to newer versions of those 
