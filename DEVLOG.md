@@ -1,9 +1,10 @@
 # Notes
-* Based on https://github.com/floooh/cimgui-sokol-starterkit
-* Requires some libraries in `..`:
+* Based on https://github.com/floooh/cimgui-sokol-starterkit 
+* Requires DaisySP libary path specified in CMakeLists.txt DAISYSP_DIR:
+  * by default it is expected in `..`
   * `git clone https://github.com/electro-smith/DaisySP` and build 
   * On Windows DaisySP file `adsr.h` needed a `#define _USE_MATH_DEFINES` before include math.h
-  * On Windows use RelWithDebInfo target. (FIXME)
+  * On Windows CMAKE_BUILD_TYPE will need to match the DaisySP build.
 * Optional libraries in `..` if running `update_deps.sh`.  Not all repos need to do this.
   * `git clone git@github.com:floooh/sokol.git`
   * `git clone --recursive https://github.com/cimgui/cimgui.git`
@@ -12,6 +13,8 @@ Most recent on top.
 ## Wedneday June 21, 2023
 
 Add very basic note control and keyboard drawing.
+
+Moved basic code into demo directory.  Different synths can be in different directories.
 
 ## Tuesday June 20, 2023
 

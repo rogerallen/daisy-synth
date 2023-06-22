@@ -47,24 +47,25 @@ endif()
 target_link_libraries(sokol PUBLIC cimgui)
 target_include_directories(sokol INTERFACE sokol)
 
-#=== EXECUTABLE: DaisySP
-# must be built in ../DaisySP
+#=== DaisySP
+# must be cloned & built in DAISYSP_DIR
+set(DAISYSP_DIR ${CMAKE_SOURCE_DIR}/../DaisySP)
 #   lib in ../DaisySP/build/libDaisySP.a
 #   incs in ../DaisySP/Source/daisysp.h
 
 #=== EXECUTABLE: demo
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    add_executable(demo WIN32 demo.c demo.cpp demo.h)
+    add_executable(demo WIN32 demo/demo.c demo/demo.cpp demo/demo.h)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT demo)
 else()
-    add_executable(demo demo.c demo.cpp demo.h)
+    add_executable(demo demo/demo.c demo/demo.cpp demo/demo.h)
 endif()
-target_include_directories(demo PRIVATE ${CMAKE_SOURCE_DIR}/../DaisySP/Source)
+target_include_directories(demo PRIVATE ${DAISYSP_DIR}/Source)
 if (CMAKE_SYSTEM_NAME STREQUAL Linux)
-target_link_libraries(demo sokol ${CMAKE_SOURCE_DIR}/../DaisySP/build/libDaisySP.a)
+    target_link_libraries(demo sokol ${DAISYSP_DIR}/build/libDaisySP.a)
 endif()
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
-target_link_libraries(demo sokol ${CMAKE_SOURCE_DIR}/../DaisySP/build/RelWithDebInfo/DaisySP.lib)
+    target_link_libraries(demo sokol ${DAISYSP_DIR}/build/${CMAKE_BUILD_TYPE}/DaisySP.lib)
 endif()
 
 # Emscripten-specific linker options
