@@ -5,11 +5,12 @@
 #include "sokol_log.h"
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include "cimgui.h"
-#include "demo.h"
 #include "sokol_audio.h"
 #include "sokol_gl.h"
 #include "sokol_imgui.h"
 #include <assert.h>
+//------------------------------------------------------------------------------
+#include "synth.h"
 
 static struct {
     sg_pass_action pass_action;

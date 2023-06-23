@@ -8,11 +8,17 @@
 * Optional libraries in `..` if running `update_deps.sh`.  Not all repos need to do this.
   * `git clone git@github.com:floooh/sokol.git`
   * `git clone --recursive https://github.com/cimgui/cimgui.git`
+# To Do
+* [x] get simplest synth example done
+* [ ] refactor/encapsulate keyboard
+* [ ] add a "real" synth and stereo
 # Log
 Most recent on top.
 ## Friday June 23, 2023
 
 Added waveform control.
+
+Rename synth c++ code for clarity.
 
 ## Thursday June 22, 2023
 

@@ -5,13 +5,13 @@
 
 #include <daisysp.h>
 
-#include "demo.h"
+#include "synth.h"
 
 static daisysp::Oscillator osc;
 static int cur_pitch = -1;
 
 // using libdaisy requires C++, so this is in a C++ file
-// To interface with C GUI code, wrap in extern "C"
+// To interface with demo.c GUI code, wrap in extern "C"
 extern "C" {
 
 void synth_init(int sample_rate)
