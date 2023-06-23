@@ -68,15 +68,17 @@ static void draw_key(int pitch, bool active)
 {
     // x ranges from -1 to 1
     float margin_x = 0.1;
+    float margin_y = 0.1;
     float start_x = -1 + margin_x;
     float end_x = 1 - margin_x;
-    // 7*2+3 white keys fit between start_x & end_x
+    // 7*2+3 white keys (48/C3 to 76/E5) fit between start_x & end_x
     float white_dx = (end_x - start_x) / (7 * 2 + 3);
     // 12 black keys fit within 7 white keys
     float black_dx = 7 * white_dx / 12;
-    // 48                     60                     72                     84
-    // C                      C                      C                      C
-    // w,b,w,b,w,w,b,w,b,w,b, w,b,w,b,w,w,b,w,b,w,b, w,b,w,b,w,w,b,w,b,w,b,
+    // 3 octaves of indices for either black or white keys
+    // to convert pitch into an index into drawing either a white
+    // or black key.  -1 indicates "use the other array"
+    // positive value indicates "draw me"
     int white_key_idx_ary[] = {
         0,  -1,     1,      -1,    2,      3,     -1,     4,     -1,
         5,  -1,     6,      7 + 0, -1,     7 + 1, -1,     7 + 2, 7 + 3,
@@ -92,31 +94,38 @@ static void draw_key(int pitch, bool active)
     assert(p >= 0);
     int white_key_idx = white_key_idx_ary[p];
     int black_key_idx = black_key_idx_ary[p];
-    // one should be -1, the other should be 0 greater
+    // one *_key_idx should be -1, the other should be 0 or greater
     assert(((white_key_idx >= 0) && (black_key_idx < 0)) ||
            ((white_key_idx < 0) && (black_key_idx >= 0)));
     if (white_key_idx >= 0) {
+        // draw a white key.  7 keys per octave
         float x = start_x + white_key_idx * white_dx;
-        float dx = white_dx * 0.95;
+        float dx = white_dx * 0.95; // leave a little in-between the keys
+        float z = 0.0f;
         int top_color = active ? 200 : 150;
         int bot_color = active ? 255 : 200;
         sgl_begin_quads();
-        sgl_v3f_c3b(x, -0.0f, 0.5f, top_color, top_color, top_color);
-        sgl_v3f_c3b(x + dx, -0.0f, 0.5f, top_color, top_color, top_color);
-        sgl_v3f_c3b(x + dx, 0.5f, 0.5f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x, 0.5f, 0.5f, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x, 0.0f + margin_y, z, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x + dx, 0.0f + margin_y, z, bot_color, bot_color,
+                    bot_color);
+        sgl_v3f_c3b(x + dx, 0.5f - margin_y, z, top_color, top_color,
+                    top_color);
+        sgl_v3f_c3b(x, 0.5f - margin_y, z, top_color, top_color, top_color);
         sgl_end();
     }
     else {
+        // draw a black key.  12 keys per octave
         float x = start_x + black_key_idx * black_dx;
         float dx = black_dx * 1.0;
+        float z = 0.5f;
         int top_color = active ? 40 : 120;
         int bot_color = active ? 50 : 150;
         sgl_begin_quads();
-        sgl_v3f_c3b(x, 0.2f, 0.0f, top_color, top_color, top_color);
-        sgl_v3f_c3b(x + dx, 0.2f, 0.0f, top_color, top_color, top_color);
-        sgl_v3f_c3b(x + dx, 0.5f, 0.0f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x, 0.5f, 0.0f, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x, 0.2f, z, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x + dx, 0.2f, z, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x + dx, 0.5f - margin_y, z, top_color, top_color,
+                    top_color);
+        sgl_v3f_c3b(x, 0.5f - margin_y, z, top_color, top_color, top_color);
         sgl_end();
     }
 }
@@ -149,7 +158,9 @@ static void frame(void)
     sgl_viewport(0, 0, sapp_width(), sapp_height(), true);
     sgl_load_pipeline(state.pip_3d);
     sgl_matrix_mode_projection();
-    sgl_ortho(-1.0, 1.0, -1.0, 1.0, 1.0, -1.0);
+    sgl_ortho(-1.0, 1.0,  // x ranges -1(left),1(right)
+              0.0, 0.5,   // y ranges 0(bottom),0.5(top)
+              -1.0, 1.0); // z ranges -1(near), 1(far) [lower z passes]
     sgl_matrix_mode_modelview();
     // draw keyboard
     for (int p = 3 * 12 + 12; p <= 3 * 12 + 40; p++) {
@@ -320,7 +331,7 @@ sapp_desc sokol_main(int argc, char *argv[])
         .event_cb = event,
         .window_title = "daisy-synth",
         .width = 800,
-        .height = 800,
+        .height = 400,
         .icon.sokol_default = true,
         .logger.func = slog_func,
     };
