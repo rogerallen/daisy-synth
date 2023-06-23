@@ -55,10 +55,10 @@ set(DAISYSP_DIR ${CMAKE_SOURCE_DIR}/../DaisySP)
 
 #=== EXECUTABLE: demo
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    add_executable(demo WIN32 demo/demo.c demo/synth.cpp demo/synth.h)
+    add_executable(demo WIN32 demo/demo.c demo/synth.cpp demo/synth.h demo/keyboard_piano.c demo/keyboard_piano.h)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT demo)
 else()
-    add_executable(demo demo/demo.c demo/synth.cpp demo/synth.h)
+    add_executable(demo demo/demo.c demo/synth.cpp demo/synth.h demo/keyboard_piano.c demo/keyboard_piano.h)
 endif()
 target_include_directories(demo PRIVATE ${DAISYSP_DIR}/Source)
 if (CMAKE_SYSTEM_NAME STREQUAL Linux)
