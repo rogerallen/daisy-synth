@@ -4,7 +4,7 @@ Simulate Daisy SP synth on Win/Mac/Linux computers to develop & check sound befo
 
 Sokol header files are nearly ideal for ease of use & cross-platform control.
 
-Work In Progress.  See `DEVLOG.md` for progress.  Tested on Windows 10, 11 and Linux via VS Code.  Emscripten is not tested.
+Work In Progress.  See `docs/DEVLOG.md` for progress.  Tested on Windows 10, 11 and Linux via VS Code.  Emscripten is not tested.
 
 # Building/Usage
 
@@ -24,4 +24,4 @@ Very Simple Synth with some GUI controls. Run `build\demo`, keyboard piano turns
 
 # License
 
-My code is MIT licensed, just as the Sokol code is.
+Code is MIT licensed, just as the Sokol code is.
