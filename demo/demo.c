@@ -64,8 +64,7 @@ static void init(void)
 // a single octave is divided into seven diatonic steps and twelve chromatic
 // steps. our range is 48/C3 to 76/E5.  But we will calculate things based on 3
 // octaves [48,84) or 21 diatonic steps and 36 chromatic steps
-// FIXME depth should work & we should not need draw_white_keys set
-static void draw_key(int pitch, bool active, bool draw_white_keys)
+static void draw_key(int pitch, bool active)
 {
     // x ranges from -1 to 1
     float margin_x = 0.1;
@@ -96,28 +95,28 @@ static void draw_key(int pitch, bool active, bool draw_white_keys)
     // one should be -1, the other should be 0 greater
     assert(((white_key_idx >= 0) && (black_key_idx < 0)) ||
            ((white_key_idx < 0) && (black_key_idx >= 0)));
-    if (white_key_idx >= 0 && draw_white_keys) {
+    if (white_key_idx >= 0) {
         float x = start_x + white_key_idx * white_dx;
         float dx = white_dx * 0.95;
         int top_color = active ? 200 : 150;
         int bot_color = active ? 255 : 200;
         sgl_begin_quads();
-        sgl_v3f_c3b(x, -0.0f, 0.9f, top_color, top_color, top_color);
-        sgl_v3f_c3b(x, 0.5f, 0.9f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, 0.5f, 0.9f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, -0.0f, 0.9f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x, -0.0f, 0.5f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x + dx, -0.0f, 0.5f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x + dx, 0.5f, 0.5f, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x, 0.5f, 0.5f, bot_color, bot_color, bot_color);
         sgl_end();
     }
-    else if (black_key_idx >= 0 && !draw_white_keys) {
+    else {
         float x = start_x + black_key_idx * black_dx;
         float dx = black_dx * 1.0;
-        int top_color = active ? 120 : 40;
-        int bot_color = active ? 150 : 50;
+        int top_color = active ? 40 : 120;
+        int bot_color = active ? 50 : 150;
         sgl_begin_quads();
-        sgl_v3f_c3b(x, 0.2f, 0.5f, top_color, top_color, top_color);
-        sgl_v3f_c3b(x, 0.5f, 0.5f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, 0.5f, 0.5f, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, 0.2f, 0.5f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x, 0.2f, 0.0f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x + dx, 0.2f, 0.0f, top_color, top_color, top_color);
+        sgl_v3f_c3b(x + dx, 0.5f, 0.0f, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x, 0.5f, 0.0f, bot_color, bot_color, bot_color);
         sgl_end();
     }
 }
@@ -148,24 +147,14 @@ static void frame(void)
     // sgl code start here
     sgl_defaults();
     sgl_viewport(0, 0, sapp_width(), sapp_height(), true);
-#if 0
-    // FIXME I cannot get depth test working...
-    sgl_push_pipeline();
     sgl_load_pipeline(state.pip_3d);
     sgl_matrix_mode_projection();
-    sgl_ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    sgl_ortho(-1.0, 1.0, -1.0, 1.0, 1.0, -1.0);
     sgl_matrix_mode_modelview();
-#endif
+    // draw keyboard
     for (int p = 3 * 12 + 12; p <= 3 * 12 + 40; p++) {
-        draw_key(p, p == get_pitch(), true);
+        draw_key(p, p == get_pitch());
     }
-    // FIXME draw black keys second since depth test is failing
-    for (int p = 3 * 12 + 12; p <= 3 * 12 + 40; p++) {
-        draw_key(p, p == get_pitch(), false);
-    }
-#if 0
-    sgl_pop_pipeline();
-#endif
     int err = sgl_error();
     if (err != SGL_NO_ERROR) {
         printf("SGL_ERROR = %d\n", err);
