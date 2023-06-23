@@ -1,10 +1,10 @@
 # Daisy Synth
 
-Simulate Daisy SP synth on Win/Mac/Linux computers to develop & check sound before putting it on Daisy.
+Simulate Daisy SP synth on Win/Mac/Linux computers to develop & check sound before putting it on Daisy.  Project is meant for Daisy synth developers.
 
 Sokol header files are nearly ideal for ease of use & cross-platform control.
 
-Work In Progress.  See `docs/DEVLOG.md` for progress.  Tested on Windows 10, 11 and Linux via VS Code.  Emscripten is not tested.
+Work In Progress.  See `docs/DEVLOG.md` for progress.  Tested on Windows 10, 11 and Linux via VS Code.  Emscripten is not tested, not expected to work.
 
 # Building/Usage
 

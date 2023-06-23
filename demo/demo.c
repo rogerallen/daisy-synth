@@ -15,6 +15,8 @@ static struct {
     sg_pass_action pass_action;
     sgl_pipeline pip_3d;
     float cur_amplitude;
+    int cur_wave;
+    int next_wave;
 } state;
 
 static void init(void)
@@ -27,10 +29,10 @@ static void init(void)
 
     // init sokol-audio with default params
     saudio_setup(&(saudio_desc){
-        .stream_cb = stream_cb,
+        .stream_cb = audio_cb,
         .logger.func = slog_func,
     });
-    daisy_init(saudio_sample_rate());
+    synth_init(saudio_sample_rate());
 
     // setup sokol-gl
     sgl_setup(&(sgl_desc_t){
@@ -56,7 +58,9 @@ static void init(void)
                                        .clear_value = {0.0f, 0.5f, 1.0f, 1.0}}};
 
     // other state
-    state.cur_amplitude = 0.05;
+    state.cur_amplitude = 0.05f;
+    state.cur_wave = 0;
+    state.next_wave = 0;
 }
 
 // draw a proper keyboard
@@ -67,8 +71,8 @@ static void init(void)
 static void draw_key(int pitch, bool active)
 {
     // x ranges from -1 to 1
-    float margin_x = 0.1;
-    float margin_y = 0.1;
+    float margin_x = 0.1f;
+    float margin_y = 0.1f;
     float start_x = -1 + margin_x;
     float end_x = 1 - margin_x;
     // 7*2+3 white keys (48/C3 to 76/E5) fit between start_x & end_x
@@ -100,7 +104,7 @@ static void draw_key(int pitch, bool active)
     if (white_key_idx >= 0) {
         // draw a white key.  7 keys per octave
         float x = start_x + white_key_idx * white_dx;
-        float dx = white_dx * 0.95; // leave a little in-between the keys
+        float dx = white_dx * 0.95f; // leave a little in-between the keys
         float z = -0.5f;
         int top_color = active ? 200 : 150;
         int bot_color = active ? 255 : 200;
@@ -116,7 +120,7 @@ static void draw_key(int pitch, bool active)
     else {
         // draw a black key.  12 keys per octave
         float x = start_x + black_key_idx * black_dx;
-        float dx = black_dx * 1.0;
+        float dx = black_dx * 1.0f;
         float z = -0.1f;
         int top_color = active ? 40 : 120;
         int bot_color = active ? 50 : 150;
@@ -141,7 +145,7 @@ static void frame(void)
 
     /*=== UI CODE STARTS HERE ===*/
     igSetNextWindowPos((ImVec2){10, 10}, ImGuiCond_Once, (ImVec2){0, 0});
-    igSetNextWindowSize((ImVec2){400, 100}, ImGuiCond_Once);
+    igSetNextWindowSize((ImVec2){540, 125}, ImGuiCond_Once);
     igBegin("Controls", 0, ImGuiWindowFlags_None);
     igText("Press a key to make a Sound.");
     // igColorEdit3("Background",
@@ -150,6 +154,23 @@ static void frame(void)
     igLabelText("Pitch", "%d", get_pitch());
     igSliderFloat("Amplitude", &state.cur_amplitude, 0.0, 1.0, "%.3f",
                   ImGuiSliderFlags_None);
+
+    igRadioButton_IntPtr("SIN", &state.next_wave, 0);
+    igSameLine(0.0f, -1.0f);
+    igRadioButton_IntPtr("TRI", &state.next_wave, 1);
+    igSameLine(0.0f, -1.0f);
+    igRadioButton_IntPtr("SAW", &state.next_wave, 2);
+    igSameLine(0.0f, -1.0f);
+    igRadioButton_IntPtr("RAMP", &state.next_wave, 3);
+    igSameLine(0.0f, -1.0f);
+    igRadioButton_IntPtr("SQUARE", &state.next_wave, 4);
+    igSameLine(0.0f, -1.0f);
+    igRadioButton_IntPtr("PB_TRI", &state.next_wave, 5);
+    igSameLine(0.0f, -1.0f);
+    igRadioButton_IntPtr("PB_SAW", &state.next_wave, 6);
+    igSameLine(0.0f, -1.0f);
+    igRadioButton_IntPtr("PB_SQUARE", &state.next_wave, 7);
+
     igEnd();
     /*=== UI CODE ENDS HERE ===*/
 
@@ -297,6 +318,11 @@ static int key_code_to_pitch(sapp_keycode kc)
 
 static void event(const sapp_event *ev)
 {
+    // handle wave radio box
+    if (state.next_wave != state.cur_wave) {
+        state.cur_wave = state.next_wave;
+        set_wave(state.cur_wave);
+    }
     bool handled = simgui_handle_event(ev);
     if (true) { // !handled) {
         if (ev->type == SAPP_EVENTTYPE_KEY_DOWN) {
