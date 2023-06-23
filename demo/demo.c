@@ -101,7 +101,7 @@ static void draw_key(int pitch, bool active)
         // draw a white key.  7 keys per octave
         float x = start_x + white_key_idx * white_dx;
         float dx = white_dx * 0.95; // leave a little in-between the keys
-        float z = 0.0f;
+        float z = -0.5f;
         int top_color = active ? 200 : 150;
         int bot_color = active ? 255 : 200;
         sgl_begin_quads();
@@ -117,7 +117,7 @@ static void draw_key(int pitch, bool active)
         // draw a black key.  12 keys per octave
         float x = start_x + black_key_idx * black_dx;
         float dx = black_dx * 1.0;
-        float z = 0.5f;
+        float z = -0.1f;
         int top_color = active ? 40 : 120;
         int bot_color = active ? 50 : 150;
         sgl_begin_quads();
@@ -161,6 +161,7 @@ static void frame(void)
     sgl_ortho(-1.0, 1.0,  // x ranges -1(left),1(right)
               0.0, 0.5,   // y ranges 0(bottom),0.5(top)
               -1.0, 1.0); // z ranges -1(near), 1(far) [lower z passes]
+    // FIXME? On Windows z seems to range -1 (far) to 0 (near)
     sgl_matrix_mode_modelview();
     // draw keyboard
     for (int p = 3 * 12 + 12; p <= 3 * 12 + 40; p++) {

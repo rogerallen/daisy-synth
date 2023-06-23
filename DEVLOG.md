@@ -10,7 +10,15 @@
   * `git clone --recursive https://github.com/cimgui/cimgui.git`
 # Log
 Most recent on top.
-## Wedneday June 21, 2023
+## Thursday June 22, 2023
+
+Figured out depth issue was really a culling issue.  Fixed & cleaned up code.
+
+Weirdness on Windows.  
+On linux depth seems to be -1(far) to 1(near).  white=0, black=0.5 works
+On windows it seems to be -1(far) to 0(near)    white=-0.5, black=0.0 works
+
+## Wednesday June 21, 2023
 
 Add very basic note control and keyboard drawing.
 
