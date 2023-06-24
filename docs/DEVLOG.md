@@ -10,7 +10,7 @@
   * `git clone --recursive https://github.com/cimgui/cimgui.git`
 # To Do
 * [x] get simplest synth example done
-* [ ] refactor/encapsulate keyboard
+* [x] refactor/encapsulate keyboard
 * [ ] add a "real" synth and stereo
 # Log
 Most recent on top.
@@ -19,6 +19,8 @@ Most recent on top.
 Added waveform control.
 
 Rename synth c++ code for clarity.
+
+Broke out keyboard, but only basically. 
 
 ## Thursday June 22, 2023
 

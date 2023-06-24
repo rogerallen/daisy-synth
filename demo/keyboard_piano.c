@@ -3,6 +3,13 @@
 #include <assert.h>
 #include <stdio.h>
 
+static keyboard_piano_state state = {.min_x = -1.0,
+                                     .max_x = 1.0,
+                                     .min_y = 0.0,
+                                     .max_y = 0.5,
+                                     .white_z = -0.5,
+                                     .black_z = -0.4};
+
 // return midi pitch for keyboard events.  return -1 for no match
 // range is 48/C3 to 76/E5
 int key_code_to_pitch(sapp_keycode kc)
@@ -121,8 +128,11 @@ static void draw_key(int pitch, bool active)
     // x ranges from -1 to 1
     float margin_x = 0.1f;
     float margin_y = 0.1f;
-    float start_x = -1 + margin_x;
-    float end_x = 1 - margin_x;
+    float start_x = state.min_x + margin_x;
+    float end_x = state.max_x - margin_x;
+    float start_y = state.min_y + margin_y;
+    float end_y = state.max_y - margin_y;
+    float mid_y = (start_y + end_y) * 0.5;
     // 7*2+3 white keys (48/C3 to 76/E5) fit between start_x & end_x
     float white_dx = (end_x - start_x) / (7 * 2 + 3);
     // 12 black keys fit within 7 white keys
@@ -151,33 +161,32 @@ static void draw_key(int pitch, bool active)
            ((white_key_idx < 0) && (black_key_idx >= 0)));
     if (white_key_idx >= 0) {
         // draw a white key.  7 keys per octave
-        float x = start_x + white_key_idx * white_dx;
-        float dx = white_dx * 0.95f; // leave a little in-between the keys
-        float z = -0.5f;
+        float x0 = start_x + white_key_idx * white_dx;
+        float x1 = x0 + white_dx * 0.95f; // leave a little in-between the keys
+        float y0 = start_y;
+        float y1 = end_y;
         int top_color = active ? 200 : 150;
         int bot_color = active ? 255 : 200;
         sgl_begin_quads();
-        sgl_v3f_c3b(x, 0.0f + margin_y, z, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, 0.0f + margin_y, z, bot_color, bot_color,
-                    bot_color);
-        sgl_v3f_c3b(x + dx, 0.5f - margin_y, z, top_color, top_color,
-                    top_color);
-        sgl_v3f_c3b(x, 0.5f - margin_y, z, top_color, top_color, top_color);
+        sgl_v3f_c3b(x0, y0, state.white_z, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x1, y0, state.white_z, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x1, y1, state.white_z, top_color, top_color, top_color);
+        sgl_v3f_c3b(x0, y1, state.white_z, top_color, top_color, top_color);
         sgl_end();
     }
     else {
         // draw a black key.  12 keys per octave
-        float x = start_x + black_key_idx * black_dx;
-        float dx = black_dx * 1.0f;
-        float z = -0.1f;
+        float x0 = start_x + black_key_idx * black_dx;
+        float x1 = x0 + black_dx;
+        float y0 = mid_y;
+        float y1 = end_y;
         int top_color = active ? 40 : 120;
         int bot_color = active ? 50 : 150;
         sgl_begin_quads();
-        sgl_v3f_c3b(x, 0.2f, z, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, 0.2f, z, bot_color, bot_color, bot_color);
-        sgl_v3f_c3b(x + dx, 0.5f - margin_y, z, top_color, top_color,
-                    top_color);
-        sgl_v3f_c3b(x, 0.5f - margin_y, z, top_color, top_color, top_color);
+        sgl_v3f_c3b(x0, y0, state.black_z, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x1, y0, state.black_z, bot_color, bot_color, bot_color);
+        sgl_v3f_c3b(x1, y1, state.black_z, top_color, top_color, top_color);
+        sgl_v3f_c3b(x0, y1, state.black_z, top_color, top_color, top_color);
         sgl_end();
     }
 }
@@ -188,10 +197,11 @@ void draw_keyboard(sgl_pipeline pip_3d, int cur_pitch)
     sgl_viewport(0, 0, sapp_width(), sapp_height(), true);
     sgl_load_pipeline(pip_3d);
     sgl_matrix_mode_projection();
-    sgl_ortho(-1.0, 1.0,  // x ranges -1(left),1(right)
-              0.0, 0.5,   // y ranges 0(bottom),0.5(top)
-              -1.0, 1.0); // z ranges -1(near), 1(far) [lower z passes]
-    // FIXME? On Windows z seems to range -1 (far) to 0 (near)
+    sgl_ortho(
+        -1.0, 1.0,                                // x ranges -1(left),1(right)
+        0.0, (float)sapp_height() / sapp_width(), // y ranges 0(bottom),0.5(top)
+        -1.0, 1.0);                               // z ranges -1(near), 1(far)
+    // FIXME? On Windows z seems to range -1 (near) to 0 (far)
     sgl_matrix_mode_modelview();
     // draw keyboard
     for (int p = 3 * 12 + 12; p <= 3 * 12 + 40; p++) {
