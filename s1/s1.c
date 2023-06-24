@@ -57,7 +57,7 @@ static void init(void)
     // initial clear color
     state.pass_action =
         (sg_pass_action){.colors[0] = {.load_action = SG_LOADACTION_CLEAR,
-                                       .clear_value = {0.0f, 0.5f, 1.0f, 1.0}}};
+                                       .clear_value = {0.6f, 0.6f, 0.3f, 1.0}}};
 
     // other state
     state.cur_amplitude = 0.05f;
@@ -163,7 +163,7 @@ sapp_desc sokol_main(int argc, char *argv[])
         .frame_cb = frame,
         .cleanup_cb = cleanup,
         .event_cb = event,
-        .window_title = "daisy-synth:demo",
+        .window_title = "daisy-synth:s1",
         .width = 800,
         .height = 400,
         .icon.sokol_default = true,

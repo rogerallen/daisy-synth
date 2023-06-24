@@ -68,21 +68,38 @@ if (CMAKE_SYSTEM_NAME STREQUAL Windows)
     target_link_libraries(demo sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
 endif()
 
-# Emscripten-specific linker options
-if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
-    set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    # use our own minimal shell.html
-    target_link_options(demo PRIVATE --shell-file ../sokol/shell.html)
-    # link with WebGL2
-    target_link_options(demo PRIVATE -sUSE_WEBGL2=1)
-    # WASM+JS size optimizations
-    target_link_options(demo PRIVATE -sNO_FILESYSTEM=1 -sASSERTIONS=0 -sMALLOC=emmalloc --closure=1)
+#=== EXECUTABLE: s1
+if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+    add_executable(s1 WIN32 s1/s1.c s1/synth.cpp s1/synth.h demo/keyboard_piano.c demo/keyboard_piano.h)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT s1)
+else()
+    add_executable(s1 s1/s1.c s1/synth.cpp s1/synth.h demo/keyboard_piano.c demo/keyboard_piano.h)
 endif()
+target_include_directories(s1 PRIVATE ${DAISYSP_DIR}/Source demo)
+if (CMAKE_SYSTEM_NAME STREQUAL Linux)
+    target_link_libraries(s1 sokol ${DAISYSP_DIR}/build/libDaisySP.a)
+endif()
+if (CMAKE_SYSTEM_NAME STREQUAL Windows)
+    target_link_libraries(s1 sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
+endif()
+
+# Emscripten-specific linker options
+#if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
+#    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+#    # use our own minimal shell.html
+#    target_link_options(demo PRIVATE --shell-file ../sokol/shell.html)
+#    # link with WebGL2
+#    target_link_options(demo PRIVATE -sUSE_WEBGL2=1)
+#    # WASM+JS size optimizations
+#    target_link_options(demo PRIVATE -sNO_FILESYSTEM=1 -sASSERTIONS=0 -sMALLOC=emmalloc --closure=1)
+#endif()
 
 # explicitly strip dead code
 if (CMAKE_C_COMPILER_ID MATCHES "Clang" AND NOT CMAKE_SYSTEM_NAME STREQUAL Emscripten)
     target_link_options(demo PRIVATE LINKER:-dead_strip)
+    target_link_options(s1 PRIVATE LINKER:-dead_strip)
 endif()
 
 # this hack removes the xxx-CMakeForceLinker.cxx dummy file
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(s1 PROPERTIES LINKER_LANGUAGE C)

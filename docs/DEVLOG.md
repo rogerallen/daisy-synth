@@ -22,6 +22,8 @@ Rename synth c++ code for clarity.
 
 Broke out keyboard, but only basically. 
 
+Started "s1" synth.  No updates.
+
 ## Thursday June 22, 2023
 
 Figured out depth issue was really a culling issue.  Fixed & cleaned up code.
