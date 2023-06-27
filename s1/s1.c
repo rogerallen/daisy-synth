@@ -19,6 +19,10 @@ static struct {
     float cur_amplitude;
     int cur_wave;
     int next_wave;
+    sapp_event_type cur_event_type;
+    bool mouse_down;
+    int mouse_x, mouse_y;
+    int mouse_pitch;
 } state;
 
 static void init(void)
@@ -57,12 +61,73 @@ static void init(void)
     // initial clear color
     state.pass_action =
         (sg_pass_action){.colors[0] = {.load_action = SG_LOADACTION_CLEAR,
-                                       .clear_value = {0.6f, 0.6f, 0.3f, 1.0}}};
+                                       .clear_value = {0.0f, 0.5f, 1.0f, 1.0}}};
 
     // other state
     state.cur_amplitude = 0.05f;
     state.cur_wave = 0;
     state.next_wave = 0;
+    state.cur_event_type = 0;
+    state.mouse_down = false;
+    state.mouse_x = -1;
+    state.mouse_y = -1;
+    state.mouse_pitch = -1;
+}
+
+static const char *eventtype_to_str(sapp_event_type t)
+{
+    switch (t) {
+    case SAPP_EVENTTYPE_INVALID:
+        return "INVALID";
+    case SAPP_EVENTTYPE_KEY_DOWN:
+        return "KEY_DOWN";
+    case SAPP_EVENTTYPE_KEY_UP:
+        return "KEY_UP";
+    case SAPP_EVENTTYPE_CHAR:
+        return "CHAR";
+    case SAPP_EVENTTYPE_MOUSE_DOWN:
+        return "MOUSE_DOWN";
+    case SAPP_EVENTTYPE_MOUSE_UP:
+        return "MOUSE_UP";
+    case SAPP_EVENTTYPE_MOUSE_SCROLL:
+        return "MOUSE_SCROLL";
+    case SAPP_EVENTTYPE_MOUSE_MOVE:
+        return "MOUSE_MOVE";
+    case SAPP_EVENTTYPE_MOUSE_ENTER:
+        return "MOUSE_ENTER";
+    case SAPP_EVENTTYPE_MOUSE_LEAVE:
+        return "MOUSE_LEAVE";
+    case SAPP_EVENTTYPE_TOUCHES_BEGAN:
+        return "TOUCHES_BEGAN";
+    case SAPP_EVENTTYPE_TOUCHES_MOVED:
+        return "TOUCHES_MOVED";
+    case SAPP_EVENTTYPE_TOUCHES_ENDED:
+        return "TOUCHES_ENDED";
+    case SAPP_EVENTTYPE_TOUCHES_CANCELLED:
+        return "TOUCHES_CANCELLED";
+    case SAPP_EVENTTYPE_RESIZED:
+        return "RESIZED";
+    case SAPP_EVENTTYPE_ICONIFIED:
+        return "ICONIFIED";
+    case SAPP_EVENTTYPE_RESTORED:
+        return "RESTORED";
+    case SAPP_EVENTTYPE_FOCUSED:
+        return "FOCUSED";
+    case SAPP_EVENTTYPE_UNFOCUSED:
+        return "UNFOCUSED";
+    case SAPP_EVENTTYPE_SUSPENDED:
+        return "SUSPENDED";
+    case SAPP_EVENTTYPE_RESUMED:
+        return "RESUMED";
+    case SAPP_EVENTTYPE_QUIT_REQUESTED:
+        return "QUIT_REQUESTED";
+    case SAPP_EVENTTYPE_CLIPBOARD_PASTED:
+        return "CLIPBOARD_PASTED";
+    case SAPP_EVENTTYPE_FILES_DROPPED:
+        return "FILES_DROPPED";
+    default:
+        return "???";
+    }
 }
 
 static void frame(void)
@@ -82,6 +147,7 @@ static void frame(void)
     // igColorEdit3("Background",
     //              &state.pass_action.colors[0].clear_value.r,
     //              ImGuiColorEditFlags_None);
+    // igLabelText("EventType", "%s", eventtype_to_str(state.cur_event_type));
     igLabelText("Pitch", "%d", get_pitch());
     igSliderFloat("Amplitude", &state.cur_amplitude, 0.0, 1.0, "%.3f",
                   ImGuiSliderFlags_None);
@@ -125,33 +191,71 @@ static void cleanup(void)
 
 static void event(const sapp_event *ev)
 {
+    state.cur_event_type = ev->type;
+
     // handle wave radio box
     if (state.next_wave != state.cur_wave) {
         state.cur_wave = state.next_wave;
         set_wave(state.cur_wave);
     }
     bool handled = simgui_handle_event(ev);
-    if (true) { // !handled) {
-        if (ev->type == SAPP_EVENTTYPE_KEY_DOWN) {
-            if (ev->key_code == SAPP_KEYCODE_ESCAPE) {
-                sapp_quit();
-            }
-            else {
-                int pitch = key_code_to_pitch(ev->key_code);
-                if (pitch > 0) {
-                    // printf("Note On  %d\n", pitch);
-                    note_on(pitch, state.cur_amplitude);
-                }
-            }
+    // always handle key events
+    if (ev->type == SAPP_EVENTTYPE_KEY_DOWN) {
+        if (ev->key_code == SAPP_KEYCODE_ESCAPE) {
+            sapp_quit();
         }
-        else if (ev->type == SAPP_EVENTTYPE_KEY_UP) {
+        else {
             int pitch = key_code_to_pitch(ev->key_code);
             if (pitch > 0) {
-                // printf("Note Off %d\n", pitch);
-                note_off(pitch);
+                // printf("Note On  %d\n", pitch);
+                note_on(pitch, state.cur_amplitude);
             }
         }
     }
+    else if (ev->type == SAPP_EVENTTYPE_KEY_UP) {
+        int pitch = key_code_to_pitch(ev->key_code);
+        if (pitch > 0) {
+            // printf("Note Off %d\n", pitch);
+            note_off(pitch);
+        }
+    }
+    // allow mouse events to be blocked by gui
+    if (!handled) {
+        if ((ev->type == SAPP_EVENTTYPE_MOUSE_DOWN) &&
+            (ev->mouse_button == SAPP_MOUSEBUTTON_LEFT)) {
+            state.mouse_down = true;
+            state.mouse_x = ev->mouse_x;
+            state.mouse_y = ev->mouse_y;
+            state.mouse_pitch =
+                xy_to_pitch((float)state.mouse_x / sapp_width(),
+                            (float)state.mouse_y / sapp_height());
+            if (state.mouse_pitch > 0) {
+                note_on(state.mouse_pitch, state.cur_amplitude);
+            }
+        }
+        else if ((ev->type == SAPP_EVENTTYPE_MOUSE_UP) &&
+                 (ev->mouse_button == SAPP_MOUSEBUTTON_LEFT)) {
+            state.mouse_down = false;
+            state.mouse_x = ev->mouse_x;
+            state.mouse_y = ev->mouse_y;
+            if (state.mouse_pitch > 0) {
+                note_off(state.mouse_pitch);
+                state.mouse_pitch = -1;
+            }
+        }
+        else if ((ev->type == SAPP_EVENTTYPE_MOUSE_MOVE) && state.mouse_down) {
+            state.mouse_x = ev->mouse_x;
+            state.mouse_y = ev->mouse_y;
+            int pitch = xy_to_pitch((float)state.mouse_x / sapp_width(),
+                                    (float)state.mouse_y / sapp_height());
+            if ((state.mouse_pitch > 0) && (pitch > 0) &&
+                (pitch != state.mouse_pitch)) {
+                state.mouse_pitch = pitch;
+                note_on(state.mouse_pitch, state.cur_amplitude);
+            }
+        }
+    }
+    // MOUSE_LEAVE/ENTER?
 }
 
 sapp_desc sokol_main(int argc, char *argv[])
@@ -163,9 +267,9 @@ sapp_desc sokol_main(int argc, char *argv[])
         .frame_cb = frame,
         .cleanup_cb = cleanup,
         .event_cb = event,
-        .window_title = "daisy-synth:s1",
+        .window_title = "daisy-synth:demo",
         .width = 800,
-        .height = 400,
+        .height = 600,
         .icon.sokol_default = true,
         .logger.func = slog_func,
     };
