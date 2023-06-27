@@ -11,9 +11,15 @@
 # To Do
 * [x] get simplest synth example done
 * [x] refactor/encapsulate keyboard
+* [x] add mouse control of keyboard
 * [ ] add a "real" synth and stereo
+* [ ] add mouse velocity+pitch xy control.
 # Log
 Most recent on top.
+## Monday June 26, 2023
+
+Add mouse control of keyboard.
+
 ## Friday June 23, 2023
 
 Added waveform control.

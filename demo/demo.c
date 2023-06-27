@@ -147,7 +147,7 @@ static void frame(void)
     // igColorEdit3("Background",
     //              &state.pass_action.colors[0].clear_value.r,
     //              ImGuiColorEditFlags_None);
-    igLabelText("EventType", "%s", eventtype_to_str(state.cur_event_type));
+    // igLabelText("EventType", "%s", eventtype_to_str(state.cur_event_type));
     igLabelText("Pitch", "%d", get_pitch());
     igSliderFloat("Amplitude", &state.cur_amplitude, 0.0, 1.0, "%.3f",
                   ImGuiSliderFlags_None);
@@ -199,27 +199,30 @@ static void event(const sapp_event *ev)
         set_wave(state.cur_wave);
     }
     bool handled = simgui_handle_event(ev);
-    if (true) { // !handled) {
-        if (ev->type == SAPP_EVENTTYPE_KEY_DOWN) {
-            if (ev->key_code == SAPP_KEYCODE_ESCAPE) {
-                sapp_quit();
-            }
-            else {
-                int pitch = key_code_to_pitch(ev->key_code);
-                if (pitch > 0) {
-                    // printf("Note On  %d\n", pitch);
-                    note_on(pitch, state.cur_amplitude);
-                }
-            }
+    // always handle key events
+    if (ev->type == SAPP_EVENTTYPE_KEY_DOWN) {
+        if (ev->key_code == SAPP_KEYCODE_ESCAPE) {
+            sapp_quit();
         }
-        else if (ev->type == SAPP_EVENTTYPE_KEY_UP) {
+        else {
             int pitch = key_code_to_pitch(ev->key_code);
             if (pitch > 0) {
-                // printf("Note Off %d\n", pitch);
-                note_off(pitch);
+                // printf("Note On  %d\n", pitch);
+                note_on(pitch, state.cur_amplitude);
             }
         }
-        else if (ev->type == SAPP_EVENTTYPE_MOUSE_DOWN) {
+    }
+    else if (ev->type == SAPP_EVENTTYPE_KEY_UP) {
+        int pitch = key_code_to_pitch(ev->key_code);
+        if (pitch > 0) {
+            // printf("Note Off %d\n", pitch);
+            note_off(pitch);
+        }
+    }
+    // allow mouse events to be blocked by gui
+    if (!handled) {
+        if ((ev->type == SAPP_EVENTTYPE_MOUSE_DOWN) &&
+            (ev->mouse_button == SAPP_MOUSEBUTTON_LEFT)) {
             state.mouse_down = true;
             state.mouse_x = ev->mouse_x;
             state.mouse_y = ev->mouse_y;
@@ -230,33 +233,29 @@ static void event(const sapp_event *ev)
                 note_on(state.mouse_pitch, state.cur_amplitude);
             }
         }
-        else if (ev->type == SAPP_EVENTTYPE_MOUSE_UP) {
+        else if ((ev->type == SAPP_EVENTTYPE_MOUSE_UP) &&
+                 (ev->mouse_button == SAPP_MOUSEBUTTON_LEFT)) {
             state.mouse_down = false;
             state.mouse_x = ev->mouse_x;
             state.mouse_y = ev->mouse_y;
-            state.mouse_pitch =
-                xy_to_pitch((float)state.mouse_x / sapp_width(),
-                            (float)state.mouse_y / sapp_height());
             if (state.mouse_pitch > 0) {
                 note_off(state.mouse_pitch);
+                state.mouse_pitch = -1;
             }
         }
-        else if (ev->type == SAPP_EVENTTYPE_MOUSE_MOVE) {
+        else if ((ev->type == SAPP_EVENTTYPE_MOUSE_MOVE) && state.mouse_down) {
             state.mouse_x = ev->mouse_x;
             state.mouse_y = ev->mouse_y;
             int pitch = xy_to_pitch((float)state.mouse_x / sapp_width(),
                                     (float)state.mouse_y / sapp_height());
-            if ((pitch > 0) && (pitch != state.mouse_pitch)) {
+            if ((state.mouse_pitch > 0) && (pitch > 0) &&
+                (pitch != state.mouse_pitch)) {
                 state.mouse_pitch = pitch;
                 note_on(state.mouse_pitch, state.cur_amplitude);
             }
-            else if (pitch < 0) {
-                state.mouse_pitch = pitch;
-                note_off(state.mouse_pitch);
-            }
         }
-        // MOUSE_LEAVE/ENTER?
     }
+    // MOUSE_LEAVE/ENTER?
 }
 
 sapp_desc sokol_main(int argc, char *argv[])

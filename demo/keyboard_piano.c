@@ -8,7 +8,30 @@ static keyboard_piano_state state = {.min_x = -1.0f,
                                      .min_y = 0.0f,
                                      .max_y = 0.5f,
                                      .white_z = -0.5f,
-                                     .black_z = -0.4f};
+                                     .black_z = -0.4f,
+                                     .margin_x = 0.1f,
+                                     .margin_y = 0.1f};
+
+// 3 octaves of indices for either black or white keys
+// to convert pitch into an index into drawing either a white
+// or black key.  -1 indicates "use the other array"
+// positive value indicates "draw me"
+static int white_key_idx_ary[] = {0,      -1, 1,      -1, 2,      3,      -1,
+                                  4,      -1, 5,      -1, 6, //
+                                  7 + 0,  -1, 7 + 1,  -1, 7 + 2,  7 + 3,  -1,
+                                  7 + 4,  -1, 7 + 5,  -1, 7 + 6, //
+                                  14 + 0, -1, 14 + 1, -1, 14 + 2, 14 + 3, -1,
+                                  14 + 4, -1, 14 + 5, -1, 14 + 6};
+static int black_key_idx_ary[] = {
+    -1, 1,      -1, 3,      -1, -1, 6,      -1, 8,      -1, 10,      -1, //
+    -1, 12 + 1, -1, 12 + 3, -1, -1, 12 + 6, -1, 12 + 8, -1, 12 + 10, -1, //
+    -1, 24 + 1, -1, 24 + 3, -1, -1, 24 + 6, -1, 24 + 8, -1, 24 + 10, -1};
+// go from x position to pitch
+static int white_pitch_idx_ary[] = {
+    0,      2,      4,      5,      7,      9,      11,      //
+    12 + 0, 12 + 2, 12 + 4, 12 + 5, 12 + 7, 12 + 9, 12 + 11, //
+    24 + 0, 24 + 2, 24 + 4, 24 + 5, 24 + 7, 24 + 9, 24 + 11,
+};
 
 // return midi pitch for keyboard events.  return -1 for no match
 // range is 48/C3 to 76/E5
@@ -126,30 +149,15 @@ int key_code_to_pitch(sapp_keycode kc)
 static void draw_key(int pitch, bool active)
 {
     // x ranges from -1 to 1
-    float margin_x = 0.1f;
-    float margin_y = 0.1f;
-    float start_x = state.min_x + margin_x;
-    float end_x = state.max_x - margin_x;
-    float start_y = state.min_y + margin_y;
-    float end_y = state.max_y - margin_y;
+    float start_x = state.min_x + state.margin_x;
+    float end_x = state.max_x - state.margin_x;
+    float start_y = state.min_y + state.margin_y;
+    float end_y = state.max_y - state.margin_y;
     float mid_y = (start_y + end_y) * 0.5f;
     // 7*2+3 white keys (48/C3 to 76/E5) fit between start_x & end_x
     float white_dx = (end_x - start_x) / (7 * 2 + 3);
     // 12 black keys fit within 7 white keys
     float black_dx = 7 * white_dx / 12;
-    // 3 octaves of indices for either black or white keys
-    // to convert pitch into an index into drawing either a white
-    // or black key.  -1 indicates "use the other array"
-    // positive value indicates "draw me"
-    int white_key_idx_ary[] = {
-        0,  -1,     1,      -1,    2,      3,     -1,     4,     -1,
-        5,  -1,     6,      7 + 0, -1,     7 + 1, -1,     7 + 2, 7 + 3,
-        -1, 7 + 4,  -1,     7 + 5, -1,     7 + 6, 14 + 0, -1,    14 + 1,
-        -1, 14 + 2, 14 + 3, -1,    14 + 4, -1,    14 + 5, -1,    14 + 6};
-    int black_key_idx_ary[] = {
-        -1, 1,      -1, 3,      -1, -1, 6,      -1, 8,      -1, 10,      -1,
-        -1, 12 + 1, -1, 12 + 3, -1, -1, 12 + 6, -1, 12 + 8, -1, 12 + 10, -1,
-        -1, 24 + 1, -1, 24 + 3, -1, -1, 24 + 6, -1, 24 + 8, -1, 24 + 10, -1};
     int p = pitch - 48;
     assert(sizeof(white_key_idx_ary) == sizeof(black_key_idx_ary));
     assert(p < sizeof(white_key_idx_ary));
@@ -218,6 +226,35 @@ int xy_to_pitch(float x, float y)
     // convert from 0-1 to sgl_ortho range
     float xx = x * 2 - 1;
     float yy = (1.0f - y) * (float)sapp_height() / sapp_width();
-    printf("%f, %f\n", xx, yy);
-    return -1;
+    // printf("%f, %f\n", xx, yy);
+
+    int pitch = -1;
+
+    // x ranges from -1 to 1
+    float start_x = state.min_x + state.margin_x;
+    float end_x = state.max_x - state.margin_x;
+    float start_y = state.min_y + state.margin_y;
+    float end_y = state.max_y - state.margin_y;
+    float mid_y = (start_y + end_y) * 0.5f;
+    // 7*2+3 white keys (48/C3 to 76/E5) fit between start_x & end_x
+    float white_dx = (end_x - start_x) / (7 * 2 + 3);
+    // 12 black keys fit within 7 white keys
+    float black_dx = 7 * white_dx / 12;
+    if ((xx >= start_x) && (xx <= end_x) && (yy >= start_y) && (yy <= end_y)) {
+        int white_pitch_idx = (int)((xx - start_x) / white_dx);
+        int black_pitch_idx = (int)((xx - start_x) / black_dx);
+        int white_pitch = white_pitch_idx_ary[white_pitch_idx];
+        int black_pitch = black_key_idx_ary[black_pitch_idx];
+        // printf("white_pitch=%d->%d black_pitch=%d->%d\n", white_pitch_idx,
+        //        white_pitch, black_pitch_idx, black_pitch);
+        if ((yy > mid_y) && black_pitch >= 0) {
+            // printf("black pitch = %d\n", black_pitch);
+            pitch = black_pitch + 48;
+        }
+        else if (white_pitch >= 0) {
+            // printf("white pitch = %d\n", white_pitch);
+            pitch = white_pitch + 48;
+        }
+    }
+    return pitch;
 }

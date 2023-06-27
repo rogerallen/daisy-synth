@@ -9,6 +9,8 @@ typedef struct keyboard_piano_state {
     float max_y;
     float white_z;
     float black_z;
+    float margin_x;
+    float margin_y;
 } keyboard_piano_state;
 
 int key_code_to_pitch(sapp_keycode kc);
