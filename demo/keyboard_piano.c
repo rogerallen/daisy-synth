@@ -153,7 +153,7 @@ static void draw_key(int pitch, bool active)
     float end_x = state.max_x - state.margin_x;
     float start_y = state.min_y + state.margin_y;
     float end_y = state.max_y - state.margin_y;
-    float mid_y = (start_y + end_y) * 0.5f;
+    float mid_y = (start_y + end_y) * 0.4f;
     // 7*2+3 white keys (48/C3 to 76/E5) fit between start_x & end_x
     float white_dx = (end_x - start_x) / (7 * 2 + 3);
     // 12 black keys fit within 7 white keys
@@ -235,7 +235,7 @@ int xy_to_pitch(float x, float y)
     float end_x = state.max_x - state.margin_x;
     float start_y = state.min_y + state.margin_y;
     float end_y = state.max_y - state.margin_y;
-    float mid_y = (start_y + end_y) * 0.5f;
+    float mid_y = (start_y + end_y) * 0.4f;
     // 7*2+3 white keys (48/C3 to 76/E5) fit between start_x & end_x
     float white_dx = (end_x - start_x) / (7 * 2 + 3);
     // 12 black keys fit within 7 white keys
