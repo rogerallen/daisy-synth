@@ -3,12 +3,12 @@
 #include <assert.h>
 #include <stdio.h>
 
-static keyboard_piano_state state = {.min_x = -1.0,
-                                     .max_x = 1.0,
-                                     .min_y = 0.0,
-                                     .max_y = 0.5,
-                                     .white_z = -0.5,
-                                     .black_z = -0.4};
+static keyboard_piano_state state = {.min_x = -1.0f,
+                                     .max_x = 1.0f,
+                                     .min_y = 0.0f,
+                                     .max_y = 0.5f,
+                                     .white_z = -0.5f,
+                                     .black_z = -0.4f};
 
 // return midi pitch for keyboard events.  return -1 for no match
 // range is 48/C3 to 76/E5
@@ -132,7 +132,7 @@ static void draw_key(int pitch, bool active)
     float end_x = state.max_x - margin_x;
     float start_y = state.min_y + margin_y;
     float end_y = state.max_y - margin_y;
-    float mid_y = (start_y + end_y) * 0.5;
+    float mid_y = (start_y + end_y) * 0.5f;
     // 7*2+3 white keys (48/C3 to 76/E5) fit between start_x & end_x
     float white_dx = (end_x - start_x) / (7 * 2 + 3);
     // 12 black keys fit within 7 white keys
@@ -211,4 +211,13 @@ void draw_keyboard(sgl_pipeline pip_3d, int cur_pitch)
     if (err != SGL_NO_ERROR) {
         printf("SGL_ERROR = %d\n", err);
     }
+}
+
+int xy_to_pitch(float x, float y)
+{
+    // convert from 0-1 to sgl_ortho range
+    float xx = x * 2 - 1;
+    float yy = (1.0f - y) * (float)sapp_height() / sapp_width();
+    printf("%f, %f\n", xx, yy);
+    return -1;
 }

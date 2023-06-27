@@ -13,3 +13,4 @@ typedef struct keyboard_piano_state {
 
 int key_code_to_pitch(sapp_keycode kc);
 void draw_keyboard(sgl_pipeline pip_3d, int cur_pitch);
+int xy_to_pitch(float x, float y);
