@@ -3,14 +3,16 @@
 #include <assert.h>
 #include <stdio.h>
 
-static keyboard_piano_state state = {.min_x = -1.0f,
-                                     .max_x = 1.0f,
-                                     .min_y = 0.0f,
-                                     .max_y = 0.5f,
-                                     .white_z = -0.5f,
-                                     .black_z = -0.4f,
-                                     .margin_x = 0.1f,
-                                     .margin_y = 0.1f};
+static keyboard_piano_state state = {
+    .min_x = -1.0f,
+    .max_x = 1.0f,
+    .min_y = 0.0f,
+    .max_y = 0.5f,
+    .white_z = -0.5f,
+    .black_z = -0.4f,
+    .margin_x = 0.1f,
+    .margin_y = 0.1f,
+};
 
 // 3 octaves of indices for either black or white keys
 // to convert pitch into an index into drawing either a white
