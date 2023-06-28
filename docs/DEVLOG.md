@@ -8,12 +8,14 @@
 * Optional libraries in `..` if running `update_deps.sh`.  Not all repos need to do this.
   * `git clone git@github.com:floooh/sokol.git`
   * `git clone --recursive https://github.com/cimgui/cimgui.git`
+
 # To Do
 * [x] get simplest synth example done
 * [x] refactor/encapsulate keyboard
 * [x] add mouse control of keyboard
+* [x] add mouse velocity+pitch xy control.
 * [ ] add a "real" synth and stereo
-* [ ] add mouse velocity+pitch xy control.
+
 # Log
 Most recent on top.
 ## Tuesday June 27, 2023
