@@ -70,10 +70,14 @@ endif()
 
 #=== EXECUTABLE: s1
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    add_executable(s1 WIN32 s1/s1.c s1/synth.cpp s1/synth.h common/keyboard_piano.c common/keyboard_piano.h)
+    add_executable(s1 WIN32 s1/s1.c s1/synth.cpp s1/synth.h 
+        common/keyboard_piano.c common/keyboard_piano.h
+        common/pitch_pressure_pad.c common/pitch_pressure_pad.h)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT s1)
 else()
-    add_executable(s1 s1/s1.c s1/synth.cpp s1/synth.h common/keyboard_piano.c common/keyboard_piano.h)
+    add_executable(s1 s1/s1.c s1/synth.cpp s1/synth.h 
+        common/keyboard_piano.c common/keyboard_piano.h
+        common/pitch_pressure_pad.c common/pitch_pressure_pad.h)
 endif()
 target_include_directories(s1 PRIVATE ${DAISYSP_DIR}/Source common)
 if (CMAKE_SYSTEM_NAME STREQUAL Linux)
