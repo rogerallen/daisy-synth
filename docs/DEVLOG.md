@@ -16,6 +16,10 @@
 * [ ] add mouse velocity+pitch xy control.
 # Log
 Most recent on top.
+## Tuesday June 27, 2023
+
+Add s1 pitch/pressure pad.
+
 ## Monday June 26, 2023
 
 Add mouse control of keyboard.
