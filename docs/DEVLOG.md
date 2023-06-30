@@ -18,6 +18,10 @@
 
 # Log
 Most recent on top.
+## Wednesday June 28, 2023
+
+Try a different tack on the C/C++ split.  I think I like this better.  See demo2.  WIP.
+
 ## Tuesday June 27, 2023
 
 Add s1 pitch/pressure pad.

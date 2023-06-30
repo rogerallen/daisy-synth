@@ -68,6 +68,21 @@ if (CMAKE_SYSTEM_NAME STREQUAL Windows)
     target_link_libraries(demo sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
 endif()
 
+#=== EXECUTABLE: demo2 (demo in c++)
+if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+    add_executable(demo2 WIN32 demo2/demo.c demo2/demo.cpp demo2/synth.cpp demo2/synth.h demo2/keyboard_piano.cpp demo2/keyboard_piano.h)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT demo2)
+else()
+    add_executable(demo2 demo2/demo.c demo2/demo.cpp demo2/synth.cpp demo2/synth.h demo2/keyboard_piano.cpp demo2/keyboard_piano.h)
+endif()
+target_include_directories(demo2 PRIVATE ${DAISYSP_DIR}/Source)
+if (CMAKE_SYSTEM_NAME STREQUAL Linux)
+    target_link_libraries(demo2 sokol ${DAISYSP_DIR}/build/libDaisySP.a)
+endif()
+if (CMAKE_SYSTEM_NAME STREQUAL Windows)
+    target_link_libraries(demo2 sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
+endif()
+
 #=== EXECUTABLE: s1
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
     add_executable(s1 WIN32 s1/s1.c s1/synth.cpp s1/synth.h 
@@ -100,10 +115,12 @@ endif()
 
 # explicitly strip dead code
 if (CMAKE_C_COMPILER_ID MATCHES "Clang" AND NOT CMAKE_SYSTEM_NAME STREQUAL Emscripten)
-    target_link_options(demo PRIVATE LINKER:-dead_strip)
-    target_link_options(s1 PRIVATE LINKER:-dead_strip)
+target_link_options(demo PRIVATE LINKER:-dead_strip)
+target_link_options(demo2 PRIVATE LINKER:-dead_strip)
+target_link_options(s1 PRIVATE LINKER:-dead_strip)
 endif()
 
 # this hack removes the xxx-CMakeForceLinker.cxx dummy file
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE C)
+#set_target_properties(demo2 PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(s1 PROPERTIES LINKER_LANGUAGE C)

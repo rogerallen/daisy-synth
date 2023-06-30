@@ -44,7 +44,9 @@ void note_on_f(float pitch, float amplitude)
 {
     cur_pitch = pitch;
     osc.SetAmp(amplitude);
-    osc.SetFreq(daisysp::mtof(pitch));
+    float f = daisysp::mtof(pitch);
+    osc.SetFreq(f);
+    printf("freq=%f\n", f);
 }
 
 void note_off(int pitch)
@@ -61,7 +63,7 @@ void note_off_f(void)
     cur_pitch = -1;
 }
 
-int get_pitch(void) { return cur_pitch; }
+float get_pitch(void) { return cur_pitch; }
 
 void set_wave(int wave) { osc.SetWaveform((uint8_t)wave); }
 }

@@ -8,7 +8,7 @@ void note_on(int pitch, float amplitude);
 void note_on_f(float pitch, float amplitude);
 void note_off(int pitch);
 void note_off_f(void);
-int get_pitch(void);
+float get_pitch(void);
 void set_wave(int wave);
 #ifdef __cplusplus
 }
