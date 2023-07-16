@@ -1,4 +1,10 @@
 //------------------------------------------------------------------------------
+// Sokol C Application to C++ Launchpad.
+//
+// This file is for taking C API calls and converting them to C++ since
+// the DaisySP is in C++ and related controls are also likely to be C++.
+//
+//------------------------------------------------------------------------------
 #include "sokol_app.h"
 #include "sokol_gfx.h"
 #include "sokol_gl.h"
@@ -49,4 +55,5 @@ void draw_keyboard(sgl_pipeline pip_3d, int cur_pitch)
 {
     keyboard_piano->draw_keyboard(pip_3d, cur_pitch);
 }
-}
+
+} // extern "C"
