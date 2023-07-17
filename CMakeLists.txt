@@ -106,8 +106,8 @@ endif()
 #=== EXECUTABLE: s12
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
     add_executable(s12 WIN32 s12/s1.c s12/s1.cpp s12/s1.h s12/synth.cpp s12/synth.h 
-    demo2/keyboard_piano.c demo2/keyboard_piano.h
-        common/pitch_pressure_pad.c common/pitch_pressure_pad.h s12/pitch_pressure_t.h)
+        demo2/keyboard_piano.cpp demo2/keyboard_piano.h
+        s12/pitch_pressure_pad.cpp s12/pitch_pressure_pad.h s12/pitch_pressure_t.h)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT s12)
 else()
     add_executable(s12 s12/s1.c s12/s1.cpp s12/s1.h s12/synth.cpp s12/synth.h 

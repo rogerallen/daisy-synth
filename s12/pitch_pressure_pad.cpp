@@ -66,7 +66,7 @@ pitch_pressure_t PitchPressurePad::pad_xy_to_pitch_pressure(float x, float y)
     float yy = (1.0f - y) * (float)sapp_height() / sapp_width();
     // printf("%f, %f\n", xx, yy);
 
-    pitch_pressure_t pp = (pitch_pressure_t){.pitch = 0.0f, .pressure = 0.0f};
+    pitch_pressure_t pp = pitch_pressure_t{}; //.pitch = 0.0f, .pressure = 0.0f};
 
     float start_x = min_x + margin_x;
     float end_x = max_x - margin_x;

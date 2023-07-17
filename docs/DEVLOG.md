@@ -18,6 +18,10 @@
 
 # Log
 Most recent on top.
+## Monday July 17, 2023
+
+Fixed up s12 on Windows.
+
 ## Sunday July 16, 2023
 
 Fixing up demo2.  Starting on s1 (see s12)
