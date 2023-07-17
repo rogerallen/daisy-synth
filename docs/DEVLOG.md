@@ -18,6 +18,10 @@
 
 # Log
 Most recent on top.
+## Sunday July 16, 2023
+
+Fixing up demo2.  Starting on s1 (see s12)
+
 ## Wednesday June 28, 2023
 
 Try a different tack on the C/C++ split.  I think I like this better.  See demo2.  WIP.
