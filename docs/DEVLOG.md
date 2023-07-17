@@ -22,6 +22,8 @@ Most recent on top.
 
 Fixed up s12 on Windows.
 
+Moved to new C/C++ split.  s12 -> s1.  demo2 -> demo.
+
 ## Sunday July 16, 2023
 
 Fixing up demo2.  Starting on s1 (see s12)

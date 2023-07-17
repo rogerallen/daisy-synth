@@ -55,10 +55,12 @@ set(DAISYSP_DIR ${CMAKE_SOURCE_DIR}/../DaisySP)
 
 #=== EXECUTABLE: demo
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    add_executable(demo WIN32 demo/demo.c demo/synth.cpp demo/synth.h common/keyboard_piano.c common/keyboard_piano.h)
+    add_executable(demo WIN32 demo/demo.c demo/demo.cpp demo/demo.h demo/synth.cpp demo/synth.h 
+        common/keyboard_piano.cpp common/keyboard_piano.h)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT demo)
 else()
-    add_executable(demo demo/demo.c demo/synth.cpp demo/synth.h common/keyboard_piano.c common/keyboard_piano.h)
+    add_executable(demo demo/demo.c demo/demo.cpp demo/synth.cpp demo/synth.h 
+        common/keyboard_piano.cpp common/keyboard_piano.h)
 endif()
 target_include_directories(demo PRIVATE ${DAISYSP_DIR}/Source common)
 if (CMAKE_SYSTEM_NAME STREQUAL Linux)
@@ -68,31 +70,16 @@ if (CMAKE_SYSTEM_NAME STREQUAL Windows)
     target_link_libraries(demo sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
 endif()
 
-#=== EXECUTABLE: demo2 (demo in c++)
-if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    add_executable(demo2 WIN32 demo2/demo.c demo2/demo.cpp demo2/demo.h demo2/synth.cpp demo2/synth.h demo2/keyboard_piano.cpp demo2/keyboard_piano.h)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT demo2)
-else()
-    add_executable(demo2 demo2/demo.c demo2/demo.cpp demo2/synth.cpp demo2/synth.h demo2/keyboard_piano.cpp demo2/keyboard_piano.h)
-endif()
-target_include_directories(demo2 PRIVATE ${DAISYSP_DIR}/Source)
-if (CMAKE_SYSTEM_NAME STREQUAL Linux)
-    target_link_libraries(demo2 sokol ${DAISYSP_DIR}/build/libDaisySP.a)
-endif()
-if (CMAKE_SYSTEM_NAME STREQUAL Windows)
-    target_link_libraries(demo2 sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
-endif()
-
 #=== EXECUTABLE: s1
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    add_executable(s1 WIN32 s1/s1.c s1/synth.cpp s1/synth.h 
-        common/keyboard_piano.c common/keyboard_piano.h
-        common/pitch_pressure_pad.c common/pitch_pressure_pad.h)
+    add_executable(s1 WIN32 s1/s1.c s1/s1.cpp s1/s1.h s1/synth.cpp s1/synth.h 
+        common/keyboard_piano.cpp common/keyboard_piano.h
+        common/pitch_pressure_pad.cpp common/pitch_pressure_pad.h common/pitch_pressure_t.h)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT s1)
 else()
-    add_executable(s1 s1/s1.c s1/synth.cpp s1/synth.h 
-        common/keyboard_piano.c common/keyboard_piano.h
-        common/pitch_pressure_pad.c common/pitch_pressure_pad.h)
+    add_executable(s1 s1/s1.c s1/s1.cpp s1/s1.h s1/synth.cpp s1/synth.h 
+        common/keyboard_piano.cpp common/keyboard_piano.h
+        common/pitch_pressure_pad.cpp common/pitch_pressure_pad.h common/pitch_pressure_t.h)
 endif()
 target_include_directories(s1 PRIVATE ${DAISYSP_DIR}/Source common)
 if (CMAKE_SYSTEM_NAME STREQUAL Linux)
@@ -100,26 +87,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL Linux)
 endif()
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
     target_link_libraries(s1 sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
-endif()
-
-
-#=== EXECUTABLE: s12
-if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-    add_executable(s12 WIN32 s12/s1.c s12/s1.cpp s12/s1.h s12/synth.cpp s12/synth.h 
-        demo2/keyboard_piano.cpp demo2/keyboard_piano.h
-        s12/pitch_pressure_pad.cpp s12/pitch_pressure_pad.h s12/pitch_pressure_t.h)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT s12)
-else()
-    add_executable(s12 s12/s1.c s12/s1.cpp s12/s1.h s12/synth.cpp s12/synth.h 
-        demo2/keyboard_piano.cpp demo2/keyboard_piano.h
-        s12/pitch_pressure_pad.cpp s12/pitch_pressure_pad.h s12/pitch_pressure_t.h)
-endif()
-target_include_directories(s12 PRIVATE ${DAISYSP_DIR}/Source demo2)
-if (CMAKE_SYSTEM_NAME STREQUAL Linux)
-    target_link_libraries(s12 sokol ${DAISYSP_DIR}/build/libDaisySP.a)
-endif()
-if (CMAKE_SYSTEM_NAME STREQUAL Windows)
-    target_link_libraries(s12 sokol ${DAISYSP_DIR}/build/$(ConfigurationName)/DaisySP.lib)
 endif()
 
 # Emscripten-specific linker options
@@ -136,11 +103,11 @@ endif()
 # explicitly strip dead code
 if (CMAKE_C_COMPILER_ID MATCHES "Clang" AND NOT CMAKE_SYSTEM_NAME STREQUAL Emscripten)
 target_link_options(demo PRIVATE LINKER:-dead_strip)
-target_link_options(demo2 PRIVATE LINKER:-dead_strip)
+target_link_options(demo PRIVATE LINKER:-dead_strip)
 target_link_options(s1 PRIVATE LINKER:-dead_strip)
 endif()
 
 # this hack removes the xxx-CMakeForceLinker.cxx dummy file
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE C)
-#set_target_properties(demo2 PROPERTIES LINKER_LANGUAGE C)
+#set_target_properties(demo PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(s1 PROPERTIES LINKER_LANGUAGE C)

@@ -1,4 +1,6 @@
 //------------------------------------------------------------------------------
+// Sokol C Application
+//------------------------------------------------------------------------------
 #include "sokol_app.h"
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
@@ -10,8 +12,7 @@
 #include "sokol_imgui.h"
 #include <assert.h>
 //------------------------------------------------------------------------------
-#include "keyboard_piano.h"
-#include "synth.h"
+#include "demo.h"
 
 static struct {
     sg_pass_action pass_action;
@@ -38,7 +39,7 @@ static void init(void)
         .stream_cb = audio_cb,
         .logger.func = slog_func,
     });
-    synth_init(saudio_sample_rate());
+    demo_init(saudio_sample_rate());
 
     // setup sokol-gl
     sgl_setup(&(sgl_desc_t){
@@ -187,6 +188,7 @@ static void cleanup(void)
     simgui_shutdown();
     sg_shutdown();
     saudio_shutdown();
+    demo_shutdown();
 }
 
 static void event(const sapp_event *ev)

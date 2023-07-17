@@ -3,19 +3,11 @@
 // GUI controls pitch, amplitude and waveform
 // also provides audio callback.
 
-#include <daisysp.h>
-
 #include "synth.h"
 
-static daisysp::Oscillator osc;
-static float cur_pitch = -1;
-
-// using libdaisy requires C++, so this is in a C++ file
-// To interface with demo.c GUI code, wrap in extern "C"
-extern "C" {
-
-void synth_init(int sample_rate)
+Synth::Synth(int sample_rate)
 {
+    cur_pitch = -1;
     osc.Init((float)sample_rate);
     osc.SetFreq(440.0);
     osc.SetAmp(0.0);
@@ -23,7 +15,7 @@ void synth_init(int sample_rate)
 }
 
 // the sample callback, running in audio thread
-void audio_cb(float *buffer, int num_frames, int num_channels)
+void Synth::audio_cb(float *buffer, int num_frames, int num_channels)
 {
     assert(1 == num_channels);
     for (int i = 0; i < num_frames; i++) {
@@ -31,7 +23,7 @@ void audio_cb(float *buffer, int num_frames, int num_channels)
     }
 }
 
-void note_on(int pitch, float amplitude)
+void Synth::note_on(int pitch, float amplitude)
 {
     if (pitch != cur_pitch) {
         cur_pitch = pitch;
@@ -40,7 +32,7 @@ void note_on(int pitch, float amplitude)
     }
 }
 
-void note_on_f(float pitch, float amplitude)
+void Synth::note_on_f(float pitch, float amplitude)
 {
     cur_pitch = pitch;
     osc.SetAmp(amplitude);
@@ -49,7 +41,7 @@ void note_on_f(float pitch, float amplitude)
     printf("freq=%f\n", f);
 }
 
-void note_off(int pitch)
+void Synth::note_off(int pitch)
 {
     if (pitch == cur_pitch) {
         osc.SetAmp(0.0);
@@ -57,13 +49,12 @@ void note_off(int pitch)
     }
 }
 
-void note_off_f(void)
+void Synth::note_off_f(void)
 {
     osc.SetAmp(0.0);
     cur_pitch = -1;
 }
 
-float get_pitch(void) { return cur_pitch; }
+int Synth::get_pitch(void) { return cur_pitch; }
 
-void set_wave(int wave) { osc.SetWaveform((uint8_t)wave); }
-}
+void Synth::set_wave(int wave) { osc.SetWaveform((uint8_t)wave); }

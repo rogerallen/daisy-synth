@@ -1,14 +1,17 @@
+#pragma once
+
+#include "pitch_pressure_t.h"
 #include "sokol_app.h"
 #include "sokol_gfx.h"
 #include "sokol_gl.h"
 
-typedef struct pitch_pressure_t {
-    float pitch;
-    float pressure;
-} pitch_pressure_t;
+class PitchPressurePad {
+  public:
+    PitchPressurePad();
+    void draw_pad(sgl_pipeline pip_3d, pitch_pressure_t pp);
+    pitch_pressure_t pad_xy_to_pitch_pressure(float x, float y);
 
-// pitch/pressure control
-typedef struct pitch_pressure_state {
+  private:
     float min_x;
     float max_x;
     float min_y;
@@ -19,7 +22,4 @@ typedef struct pitch_pressure_state {
     float active_z;
     float min_pitch, max_pitch;
     float min_pressure, max_pressure;
-} pitch_pressure_state;
-
-void draw_pad(sgl_pipeline pip_3d, pitch_pressure_t pp);
-pitch_pressure_t pad_xy_to_pitch_pressure(float x, float y);
+};
