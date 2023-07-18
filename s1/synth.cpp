@@ -38,7 +38,7 @@ void Synth::note_on_f(float pitch, float amplitude)
     osc.SetAmp(amplitude);
     float f = daisysp::mtof(pitch);
     osc.SetFreq(f);
-    printf("freq=%f\n", f);
+    // printf("pitch=%f freq=%f\n", pitch, f);
 }
 
 void Synth::note_off(int pitch)

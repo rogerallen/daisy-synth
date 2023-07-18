@@ -75,5 +75,11 @@ pitch_pressure_t pad_xy_to_pitch_pressure(float x, float y)
 {
     return pitch_pressure_pad->pad_xy_to_pitch_pressure(x, y);
 }
+pitch_pressure_t pad_xy_to_pitch_bend_pressure(float factor, float start_x,
+                                               float start_y, float x, float y)
+{
+    return pitch_pressure_pad->pad_xy_to_pitch_bend_pressure(factor, start_x,
+                                                             start_y, x, y);
+}
 
 } // extern "C"

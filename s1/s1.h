@@ -26,7 +26,8 @@ int xy_to_pitch(float x, float y);
 // pitch_pressure pad
 void draw_pad(sgl_pipeline pip_3d, pitch_pressure_t pp);
 pitch_pressure_t pad_xy_to_pitch_pressure(float x, float y);
-
+pitch_pressure_t pad_xy_to_pitch_bend_pressure(float factor, float start_x,
+                                               float start_y, float x, float y);
 #ifdef __cplusplus
 }
 #endif

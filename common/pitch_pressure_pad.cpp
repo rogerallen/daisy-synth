@@ -16,6 +16,8 @@ PitchPressurePad::PitchPressurePad()
     max_pitch = 77.0;
     min_pressure = 0.01;
     max_pressure = 0.9;
+
+    start_pitch = 0.0;
 }
 
 void PitchPressurePad::draw_pad(sgl_pipeline pip_3d, pitch_pressure_t pp)
@@ -61,12 +63,13 @@ void PitchPressurePad::draw_pad(sgl_pipeline pip_3d, pitch_pressure_t pp)
 
 pitch_pressure_t PitchPressurePad::pad_xy_to_pitch_pressure(float x, float y)
 {
-    // convert from 0-1 to sgl_ortho range
+    // convert from 0,1 to sgl_ortho range -1,1
     float xx = x * 2 - 1;
     float yy = (1.0f - y) * (float)sapp_height() / sapp_width();
     // printf("%f, %f\n", xx, yy);
 
-    pitch_pressure_t pp = pitch_pressure_t{}; //.pitch = 0.0f, .pressure = 0.0f};
+    pitch_pressure_t pp =
+        pitch_pressure_t{}; //.pitch = 0.0f, .pressure = 0.0f};
 
     float start_x = min_x + margin_x;
     float end_x = max_x - margin_x;
@@ -74,7 +77,34 @@ pitch_pressure_t PitchPressurePad::pad_xy_to_pitch_pressure(float x, float y)
     float end_y = max_y - margin_y;
     if ((xx >= start_x) && (xx <= end_x) && (yy >= start_y) && (yy <= end_y)) {
         float ax = (xx - start_x) / (end_x - start_x);
-        pp.pitch = lerp(ax, min_pitch, max_pitch);
+        // start the pitch on a note, not in-between
+        int start_pitch_i = (int)lerp(ax, min_pitch, max_pitch);
+        pp.pitch = start_pitch = (float)start_pitch_i;
+        float ay = (yy - start_y) / (end_y - start_y);
+        pp.pressure = lerp(ay, min_pressure, max_pressure);
+        // printf("ax=%f ay=%f\n", ax, ay);
+        // printf("pi=%f pr=%f\n", pp.pitch, pp.pressure);
+    }
+    return pp;
+}
+
+pitch_pressure_t PitchPressurePad::pad_xy_to_pitch_bend_pressure(
+    float factor, float start_x_, float start_y_, float x, float y)
+{
+    float xx = x * 2 - 1;
+    float yy = (1.0f - y) * (float)sapp_height() / sapp_width();
+
+    float d_pitch = factor * ((float)x - start_x_) * (max_pitch - min_pitch);
+
+    pitch_pressure_t pp =
+        pitch_pressure_t{}; //.pitch = 0.0f, .pressure = 0.0f};
+
+    float start_x = min_x + margin_x;
+    float end_x = max_x - margin_x;
+    float start_y = min_y;
+    float end_y = max_y - margin_y;
+    if ((xx >= start_x) && (xx <= end_x) && (yy >= start_y) && (yy <= end_y)) {
+        pp.pitch = start_pitch + d_pitch;
         float ay = (yy - start_y) / (end_y - start_y);
         pp.pressure = lerp(ay, min_pressure, max_pressure);
         // printf("ax=%f ay=%f\n", ax, ay);

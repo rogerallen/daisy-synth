@@ -22,9 +22,11 @@ static struct {
     int next_wave;
     sapp_event_type cur_event_type;
     bool mouse_down;
+    int start_mouse_x, start_mouse_y;
     int mouse_x, mouse_y;
     int mouse_pitch;
     pitch_pressure_t pad;
+    float pitch_bend_factor;
 } state;
 
 static void init(void)
@@ -71,10 +73,13 @@ static void init(void)
     state.next_wave = 0;
     state.cur_event_type = 0;
     state.mouse_down = false;
+    state.start_mouse_x = -1;
+    state.start_mouse_y = -1;
     state.mouse_x = -1;
     state.mouse_y = -1;
     state.mouse_pitch = -1;
     state.pad = (pitch_pressure_t){.pitch = 0.0f, .pressure = 0.0f};
+    state.pitch_bend_factor = 3.0f;
 }
 
 static const char *eventtype_to_str(sapp_event_type t)
@@ -156,7 +161,8 @@ static void frame(void)
     igLabelText("PadPressure", "%f", state.pad.pressure);
     igSliderFloat("Amplitude", &state.cur_amplitude, 0.0, 1.0, "%.3f",
                   ImGuiSliderFlags_None);
-
+    igSliderFloat("PitchBendFactor", &state.pitch_bend_factor, 0.0, 12.0,
+                  "%.3f", ImGuiSliderFlags_None);
     igRadioButton_IntPtr("SIN", &state.next_wave, 0);
     igSameLine(0.0f, -1.0f);
     igRadioButton_IntPtr("TRI", &state.next_wave, 1);
@@ -231,8 +237,8 @@ static void event(const sapp_event *ev)
         if ((ev->type == SAPP_EVENTTYPE_MOUSE_DOWN) &&
             (ev->mouse_button == SAPP_MOUSEBUTTON_LEFT)) {
             state.mouse_down = true;
-            state.mouse_x = ev->mouse_x;
-            state.mouse_y = ev->mouse_y;
+            state.start_mouse_x = state.mouse_x = ev->mouse_x;
+            state.start_mouse_y = state.mouse_y = ev->mouse_y;
             state.pad =
                 pad_xy_to_pitch_pressure((float)state.mouse_x / sapp_width(),
                                          (float)state.mouse_y / sapp_height());
@@ -266,9 +272,13 @@ static void event(const sapp_event *ev)
         else if ((ev->type == SAPP_EVENTTYPE_MOUSE_MOVE) && state.mouse_down) {
             state.mouse_x = ev->mouse_x;
             state.mouse_y = ev->mouse_y;
-            state.pad =
-                pad_xy_to_pitch_pressure((float)state.mouse_x / sapp_width(),
-                                         (float)state.mouse_y / sapp_height());
+            // printf("mouse x=%d y=%d ", state.mouse_x, state.mouse_y);
+            state.pad = pad_xy_to_pitch_bend_pressure(
+                state.pitch_bend_factor,
+                (float)state.start_mouse_x / sapp_width(),
+                (float)state.start_mouse_y / sapp_height(),
+                (float)state.mouse_x / sapp_width(),
+                (float)state.mouse_y / sapp_height());
             if (state.pad.pressure > 0.0) {
                 note_on_f(state.pad.pitch, state.pad.pressure);
             }

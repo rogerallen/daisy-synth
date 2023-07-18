@@ -41,6 +41,12 @@ Very Simple Synth with some GUI controls. Run `build\demo`, keyboard piano turns
       |/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|
 ```
 
+# s1
+
+"real" synth. (Work-in-progress)
+
+Run `build\demo`, keyboard piano & pressure_pad turns notes on/bends/off, ESC to quit.
+
 # License
 
 Code is MIT licensed, just as the Sokol code is.
