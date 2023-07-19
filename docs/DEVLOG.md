@@ -14,10 +14,20 @@
 * [x] refactor/encapsulate keyboard
 * [x] add mouse control of keyboard
 * [x] add mouse velocity+pitch xy control.
-* [ ] add a "real" synth and stereo
+* [ ] add a "real" synth (see RogoSynth and RibbonTest)
+  * [ ] stereo & panning
+  * [x] MoogLadder rlpf & control 
+  * [x] ReverbSc
+  * [x] Compressor
 
 # Log
+
 Most recent on top.
+
+## Tuesday July 18, 2023
+
+Add some of the basic blocks for s1
+
 ## Monday July 17, 2023
 
 Fixed up s12 on Windows.

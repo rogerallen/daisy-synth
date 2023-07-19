@@ -149,7 +149,7 @@ static void frame(void)
 
     /*=== UI CODE STARTS HERE ===*/
     igSetNextWindowPos((ImVec2){10, 10}, ImGuiCond_Once, (ImVec2){0, 0});
-    igSetNextWindowSize((ImVec2){540, 125}, ImGuiCond_Once);
+    igSetNextWindowSize((ImVec2){540, 200}, ImGuiCond_Once);
     igBegin("Controls", 0, ImGuiWindowFlags_None);
     igText("Press a key to make a Sound.");
     // igColorEdit3("Background",
@@ -307,7 +307,7 @@ sapp_desc sokol_main(int argc, char *argv[])
         .event_cb = event,
         .window_title = "daisy-synth:demo",
         .width = 800,
-        .height = 600,
+        .height = 900,
         .icon.sokol_default = true,
         .logger.func = slog_func,
     };

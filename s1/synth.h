@@ -17,4 +17,7 @@ class Synth {
   private:
     int cur_pitch;
     daisysp::Oscillator osc;
+    daisysp::MoogLadder flt;
+    daisysp::ReverbSc verb;
+    daisysp::Compressor comp;
 };
