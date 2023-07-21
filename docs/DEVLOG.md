@@ -14,15 +14,22 @@
 * [x] refactor/encapsulate keyboard
 * [x] add mouse control of keyboard
 * [x] add mouse velocity+pitch xy control.
-* [ ] add a "real" synth (see RogoSynth and RibbonTest)
-  * [ ] stereo & panning
+* [x] add a "real" synth (see RogoSynth and RibbonTest)
+  * [x] stereo & panning
+  * [x] Adsr envelope
   * [x] MoogLadder rlpf & control 
   * [x] ReverbSc
   * [x] Compressor
+  * [ ] fixup gui
 
 # Log
 
 Most recent on top.
+
+## Thursday July 20, 2023
+
+Added ADSR envelope.  Add getters/setters.  Add stereo.
+Need to add GUI.
 
 ## Tuesday July 18, 2023
 

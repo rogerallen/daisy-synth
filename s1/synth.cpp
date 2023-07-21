@@ -7,27 +7,46 @@
 
 Synth::Synth(int sample_rate)
 {
-    cur_pitch = -1;
+    gate_ = false;
 
-    osc.Init((float)sample_rate);
-    osc.SetFreq(440.0);
-    osc.SetAmp(0.0);
-    osc.SetWaveform(osc.WAVE_SIN);
+    osc_pitch_ = -1;
+    osc_wave_ = osc_.WAVE_SIN;
+    osc_.Init((float)sample_rate);
+    osc_.SetFreq(daisysp::mtof((float)osc_pitch_));
+    osc_.SetAmp(1.0);
+    osc_.SetWaveform(osc_wave_);
 
-    flt.Init((float)sample_rate);
-    flt.SetFreq(1800);
-    flt.SetRes(0.9);
+    env_attack_time_ = 0.01;
+    env_decay_time_ = 0.01;
+    env_sustain_level_ = 0.9;
+    env_release_time_ = 0.01;
+    env_.Init(sample_rate);
+    env_.SetAttackTime(env_attack_time_);
+    env_.SetDecayTime(env_decay_time_);
+    env_.SetSustainLevel(env_sustain_level_);
+    env_.SetReleaseTime(env_release_time_);
 
-    verb.Init((float)sample_rate);
-    verb.SetFeedback(0.55);
-    verb.SetLpFreq(18000.0);
+    flt_freq_ = 1800.0;
+    flt_res_ = 0.9;
+    flt_.Init((float)sample_rate);
+    flt_.SetFreq(flt_freq_);
+    flt_.SetRes(flt_res_);
 
-    comp.Init((float)sample_rate);
+    verb_feedback_ = 0.55;
+    verb_lp_freq_ = 18000.0;
+    verb_.Init((float)sample_rate);
+    verb_.SetFeedback(verb_feedback_);
+    verb_.SetLpFreq(verb_lp_freq_);
+
+    comp_l_.Init((float)sample_rate);
+    comp_r_.Init((float)sample_rate);
     // comp.SetAttack();
     // comp.SetMakeup();
     // comp.SetRatio();
     // comp.SetRelease();
     // comp.SetThreshold();
+
+    pan_ = 0.0; // -1.0 - 1.0
 }
 
 // From Supercollider doc: Two channel equal power panner. Pan2 takes the square
@@ -45,58 +64,58 @@ void pan(float *v, float position)
 // the sample callback, running in audio thread
 void Synth::audio_cb(float *buffer, int num_frames, int num_channels)
 {
-    assert(1 == num_channels); // FIXME
+    assert(2 == num_channels); // FIXME
     for (int i = 0; i < num_frames; i++) {
-        float dry = osc.Process();
+        float dry = osc_.Process();
+
+        // ADSR
+        dry *= env_.Process(gate_);
 
         // filter it
-        dry = flt.Process(dry);
+        dry = flt_.Process(dry);
 
         float wet_l, wet_r;
-        verb.Process(dry, dry, &wet_l, &wet_r);
-        float wet = (wet_l + wet_r) * 0.5f; // FIXME
+        verb_.Process(dry, dry, &wet_l, &wet_r);
 
         float reverb_factor = 0.5;
-        float mix = (dry * (1.0 - reverb_factor)) + (wet * reverb_factor);
+        float mix[2];
+        mix[0] = (dry * (1.0 - reverb_factor)) + (wet_l * reverb_factor);
+        mix[1] = (dry * (1.0 - reverb_factor)) + (wet_r * reverb_factor);
 
-        mix = comp.Process(mix);
+        mix[0] = comp_l_.Process(mix[0]);
+        mix[1] = comp_r_.Process(mix[1]);
 
-        buffer[i] = mix; // FIXME
+        pan(mix, pan_);
+
+        buffer[2 * i + 0] = mix[0];
+        buffer[2 * i + 1] = mix[1];
     }
 }
 
 void Synth::note_on(int pitch, float amplitude)
 {
-    if (pitch != cur_pitch) {
-        cur_pitch = pitch;
-        osc.SetAmp(amplitude);
-        osc.SetFreq(daisysp::mtof((float)pitch));
-    }
+    note_on_f((float)pitch, amplitude);
 }
 
 void Synth::note_on_f(float pitch, float amplitude)
 {
-    cur_pitch = pitch;
-    osc.SetAmp(amplitude);
-    float f = daisysp::mtof(pitch);
-    osc.SetFreq(f);
-    // printf("pitch=%f freq=%f\n", pitch, f);
+    osc_pitch_ = pitch;
+    // osc_.SetAmp(amplitude);
+    set_env_sustain_level(amplitude);
+    osc_.SetFreq(daisysp::mtof(pitch));
+    if (!gate_) {
+        env_.Retrigger(false);
+    }
+    gate_ = true;
 }
 
 void Synth::note_off(int pitch)
 {
-    if (pitch == cur_pitch) {
-        osc.SetAmp(0.0);
-        cur_pitch = -1;
-    }
+    note_off_f(); // ignoring pitch.  FIXME?
 }
 
 void Synth::note_off_f(void)
 {
-    osc.SetAmp(0.0);
-    cur_pitch = -1;
+    gate_ = false;
+    osc_pitch_ = -1;
 }
-
-int Synth::get_pitch(void) { return cur_pitch; }
-
-void Synth::set_wave(int wave) { osc.SetWaveform((uint8_t)wave); }

@@ -39,6 +39,7 @@ static void init(void)
 
     // init sokol-audio with default params
     saudio_setup(&(saudio_desc){
+        .num_channels = 2, // stereo
         .stream_cb = audio_cb,
         .logger.func = slog_func,
     });
@@ -68,7 +69,7 @@ static void init(void)
                                        .clear_value = {0.0f, 0.5f, 1.0f, 1.0}}};
 
     // other state
-    state.cur_amplitude = 0.05f;
+    state.cur_amplitude = 0.5f;
     state.cur_wave = 0;
     state.next_wave = 0;
     state.cur_event_type = 0;
