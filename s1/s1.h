@@ -11,10 +11,8 @@ void s1_shutdown(void);
 
 // synth
 void audio_cb(float *buffer, int num_frames, int num_channels);
-void note_on(int pitch, float amplitude);
-void note_on_f(float pitch, float amplitude);
-void note_off(int pitch);
-void note_off_f(void);
+void note_on(float pitch, float amplitude);
+void note_off(void);
 int get_pitch(void);
 void set_wave(int wave);
 

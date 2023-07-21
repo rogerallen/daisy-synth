@@ -227,10 +227,10 @@ static void event(const sapp_event *ev)
         }
     }
     else if (ev->type == SAPP_EVENTTYPE_KEY_UP) {
-        int pitch = key_code_to_pitch(ev->key_code);
+        float pitch = key_code_to_pitch(ev->key_code);
         if (pitch > 0) {
             // printf("Note Off %d\n", pitch);
-            note_off(pitch);
+            note_off();
         }
     }
     // allow mouse events to be blocked by gui
@@ -244,7 +244,7 @@ static void event(const sapp_event *ev)
                 pad_xy_to_pitch_pressure((float)state.mouse_x / sapp_width(),
                                          (float)state.mouse_y / sapp_height());
             if (state.pad.pressure > 0.0) {
-                note_on_f(state.pad.pitch, state.pad.pressure);
+                note_on(state.pad.pitch, state.pad.pressure);
             }
             else {
                 state.mouse_pitch =
@@ -261,13 +261,13 @@ static void event(const sapp_event *ev)
             state.mouse_x = ev->mouse_x;
             state.mouse_y = ev->mouse_y;
             if (state.mouse_pitch > 0) {
-                note_off(state.mouse_pitch);
+                note_off();
                 state.mouse_pitch = -1;
             }
             if (state.pad.pressure > 0.0) {
                 state.pad.pitch = 0.0f;
                 state.pad.pressure = 0.0f;
-                note_off_f();
+                note_off();
             }
         }
         else if ((ev->type == SAPP_EVENTTYPE_MOUSE_MOVE) && state.mouse_down) {
@@ -281,11 +281,12 @@ static void event(const sapp_event *ev)
                 (float)state.mouse_x / sapp_width(),
                 (float)state.mouse_y / sapp_height());
             if (state.pad.pressure > 0.0) {
-                note_on_f(state.pad.pitch, state.pad.pressure);
+                note_on(state.pad.pitch, state.pad.pressure);
             }
             else {
-                int pitch = xy_to_pitch((float)state.mouse_x / sapp_width(),
-                                        (float)state.mouse_y / sapp_height());
+                float pitch =
+                    (float)xy_to_pitch((float)state.mouse_x / sapp_width(),
+                                       (float)state.mouse_y / sapp_height());
                 if ((state.mouse_pitch > 0) && (pitch > 0) &&
                     (pitch != state.mouse_pitch)) {
                     state.mouse_pitch = pitch;

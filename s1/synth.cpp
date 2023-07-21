@@ -34,6 +34,7 @@ Synth::Synth(int sample_rate)
 
     verb_feedback_ = 0.55;
     verb_lp_freq_ = 18000.0;
+    verb_wet_factor_ = 0.5;
     verb_.Init((float)sample_rate);
     verb_.SetFeedback(verb_feedback_);
     verb_.SetLpFreq(verb_lp_freq_);
@@ -55,7 +56,7 @@ Synth::Synth(int sample_rate)
 // inherent to linear panning is that the perceived volume of the signal drops
 // in the middle.
 // position ranges from [-1,1]
-void pan(float *v, float position)
+inline void pan(float *v, float position)
 {
     v[0] *= sqrtf((1.0f - position) / 2.0f);
     v[1] *= sqrtf((1.0f + position) / 2.0f);
@@ -64,27 +65,28 @@ void pan(float *v, float position)
 // the sample callback, running in audio thread
 void Synth::audio_cb(float *buffer, int num_frames, int num_channels)
 {
-    assert(2 == num_channels); // FIXME
+    assert(2 == num_channels);
     for (int i = 0; i < num_frames; i++) {
         float dry = osc_.Process();
 
         // ADSR
         dry *= env_.Process(gate_);
 
-        // filter it
+        // rlpf
         dry = flt_.Process(dry);
 
+        // reverb -> stereo output
         float wet_l, wet_r;
-        verb_.Process(dry, dry, &wet_l, &wet_r);
-
-        float reverb_factor = 0.5;
         float mix[2];
-        mix[0] = (dry * (1.0 - reverb_factor)) + (wet_l * reverb_factor);
-        mix[1] = (dry * (1.0 - reverb_factor)) + (wet_r * reverb_factor);
+        verb_.Process(dry, dry, &wet_l, &wet_r);
+        mix[0] = (dry * (1.0 - verb_wet_factor_)) + (wet_l * verb_wet_factor_);
+        mix[1] = (dry * (1.0 - verb_wet_factor_)) + (wet_r * verb_wet_factor_);
 
+        // stereo compress
         mix[0] = comp_l_.Process(mix[0]);
         mix[1] = comp_r_.Process(mix[1]);
 
+        // stereo pan
         pan(mix, pan_);
 
         buffer[2 * i + 0] = mix[0];
@@ -92,12 +94,7 @@ void Synth::audio_cb(float *buffer, int num_frames, int num_channels)
     }
 }
 
-void Synth::note_on(int pitch, float amplitude)
-{
-    note_on_f((float)pitch, amplitude);
-}
-
-void Synth::note_on_f(float pitch, float amplitude)
+void Synth::note_on(float pitch, float amplitude)
 {
     osc_pitch_ = pitch;
     // osc_.SetAmp(amplitude);
@@ -109,12 +106,7 @@ void Synth::note_on_f(float pitch, float amplitude)
     gate_ = true;
 }
 
-void Synth::note_off(int pitch)
-{
-    note_off_f(); // ignoring pitch.  FIXME?
-}
-
-void Synth::note_off_f(void)
+void Synth::note_off()
 {
     gate_ = false;
     osc_pitch_ = -1;

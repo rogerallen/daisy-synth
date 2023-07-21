@@ -42,14 +42,9 @@ void audio_cb(float *buffer, int num_frames, int num_channels)
     synth->audio_cb(buffer, num_frames, num_channels);
 }
 
-void note_on(int pitch, float amplitude) { synth->note_on(pitch, amplitude); }
-void note_on_f(float pitch, float amplitude)
-{
-    synth->note_on_f(pitch, amplitude);
-}
-void note_off(int pitch) { synth->note_off(pitch); }
-void note_off_f() { synth->note_off_f(); }
-int get_pitch(void) { return synth->get_pitch(); }
+void note_on(float pitch, float amplitude) { synth->note_on(pitch, amplitude); }
+void note_off() { synth->note_off(); }
+int get_pitch() { return synth->get_pitch(); }
 void set_wave(int wave) { synth->set_wave(wave); }
 
 // keyboard

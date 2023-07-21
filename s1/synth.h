@@ -9,10 +9,8 @@ class Synth {
     void audio_cb(float *buffer, int num_frames, int num_channels);
 
     // set freq/amp params
-    void note_on(int pitch, float amplitude);
-    void note_on_f(float pitch, float amplitude);
-    void note_off(int pitch);
-    void note_off_f(void);
+    void note_on(float pitch, float amplitude);
+    void note_off(void);
     // getter setters
     int get_pitch(void) { return osc_pitch_; }
     int get_wave() { return osc_wave_; }
@@ -71,6 +69,12 @@ class Synth {
         verb_lp_freq_ = v;
         verb_.SetFeedback(verb_lp_freq_);
     }
+    float get_verb_wet_factor() { return verb_wet_factor_; }
+    void set_verb_wet_factor(float v)
+    {
+        verb_wet_factor_ = v;
+        verb_.SetFeedback(verb_wet_factor_);
+    }
 
     float get_pan() { return pan_; }
     void set_pan(float v) { pan_ = v; }
@@ -91,6 +95,7 @@ class Synth {
     daisysp::ReverbSc verb_;
     float verb_feedback_;
     float verb_lp_freq_;
+    float verb_wet_factor_;
     daisysp::Compressor comp_l_, comp_r_;
     float pan_;
 };
