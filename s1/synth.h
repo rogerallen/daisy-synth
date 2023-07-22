@@ -11,8 +11,10 @@ class Synth {
     // set freq/amp params
     void note_on(float pitch, float amplitude);
     void note_off(void);
+
     // getter setters
-    int get_pitch(void) { return osc_pitch_; }
+    float get_pitch(void) { return osc_pitch_; }
+    float get_frequency(void) { return daisysp::mtof(osc_pitch_); }
     int get_wave() { return osc_wave_; }
     void set_wave(int wave)
     {

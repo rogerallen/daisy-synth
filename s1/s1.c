@@ -178,8 +178,9 @@ static void frame(void)
     //              &state.pass_action.colors[0].clear_value.r,
     //              ImGuiColorEditFlags_None);
     // igLabelText("EventType", "%s", eventtype_to_str(state.cur_event_type));
-    igLabelText("Pitch,PadPitch/Pressure", "%d %f %f", get_pitch(),
-                state.pad.pitch, state.pad.pressure);
+    igLabelText("Freq,Pitch,PadPitch/Pressure", "%.3f %.3f %.3f %.3f",
+                get_frequency(), get_pitch(), state.pad.pitch,
+                state.pad.pressure);
     igSliderFloat("Amplitude", &state.cur_amplitude, 0.0, 1.0, "%.3f",
                   ImGuiSliderFlags_None);
     igSliderFloat("PitchBendFactor", &state.pitch_bend_factor, 0.0, 12.0,

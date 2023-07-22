@@ -11,6 +11,9 @@
 
 # To Do
 
+[ ] name, comment, save & load settings via JSON
+[ ] record, save audio?
+
 # Log
 
 Most recent on top.

@@ -44,7 +44,8 @@ void audio_cb(float *buffer, int num_frames, int num_channels)
 
 void note_on(float pitch, float amplitude) { synth->note_on(pitch, amplitude); }
 void note_off() { synth->note_off(); }
-int get_pitch() { return synth->get_pitch(); }
+float get_pitch() { return synth->get_pitch(); }
+float get_frequency() { return synth->get_frequency(); }
 int get_wave(void) { return synth->get_wave(); }
 void set_wave(int wave) { synth->set_wave(wave); }
 float get_env_attack_time() { return synth->get_env_attack_time(); }

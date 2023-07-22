@@ -55,7 +55,8 @@ Synth::Synth(int sample_rate)
 // (~=0.707) in the center, which is about 3dB reduction.  Avoids problem
 // inherent to linear panning is that the perceived volume of the signal drops
 // in the middle.
-// position ranges from [-1,1]
+// position ranges from [-1(left),1(right)]
+// assumes v[0] is left and v[1] is right
 inline void pan(float *v, float position)
 {
     v[0] *= sqrtf((1.0f - position) / 2.0f);
@@ -76,11 +77,11 @@ void Synth::audio_cb(float *buffer, int num_frames, int num_channels)
         dry = flt_.Process(dry);
 
         // reverb -> stereo output
-        float wet_l, wet_r;
+        float wet[2];
         float mix[2];
-        verb_.Process(dry, dry, &wet_l, &wet_r);
-        mix[0] = (dry * (1.0 - verb_wet_factor_)) + (wet_l * verb_wet_factor_);
-        mix[1] = (dry * (1.0 - verb_wet_factor_)) + (wet_r * verb_wet_factor_);
+        verb_.Process(dry, dry, &(wet[0]), &(wet[1]));
+        mix[0] = (dry * (1.0 - verb_wet_factor_)) + (wet[0] * verb_wet_factor_);
+        mix[1] = (dry * (1.0 - verb_wet_factor_)) + (wet[1] * verb_wet_factor_);
 
         // stereo compress
         mix[0] = comp_l_.Process(mix[0]);
