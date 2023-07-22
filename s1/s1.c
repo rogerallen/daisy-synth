@@ -171,16 +171,15 @@ static void frame(void)
 
     /*=== UI CODE STARTS HERE ===*/
     igSetNextWindowPos((ImVec2){10, 10}, ImGuiCond_Once, (ImVec2){0, 0});
-    igSetNextWindowSize((ImVec2){540, 200}, ImGuiCond_Once);
+    igSetNextWindowSize((ImVec2){546, 356}, ImGuiCond_Once);
     igBegin("Controls", 0, ImGuiWindowFlags_None);
-    igText("Press a key to make a Sound.");
+    // igText("Use Keyboard or Mouse to make a Sound.");
     // igColorEdit3("Background",
     //              &state.pass_action.colors[0].clear_value.r,
     //              ImGuiColorEditFlags_None);
     // igLabelText("EventType", "%s", eventtype_to_str(state.cur_event_type));
-    igLabelText("Pitch", "%d", get_pitch());
-    igLabelText("PadPitch", "%f", state.pad.pitch);
-    igLabelText("PadPressure", "%f", state.pad.pressure);
+    igLabelText("Pitch,PadPitch/Pressure", "%d %f %f", get_pitch(),
+                state.pad.pitch, state.pad.pressure);
     igSliderFloat("Amplitude", &state.cur_amplitude, 0.0, 1.0, "%.3f",
                   ImGuiSliderFlags_None);
     igSliderFloat("PitchBendFactor", &state.pitch_bend_factor, 0.0, 12.0,
@@ -315,9 +314,11 @@ static void event(const sapp_event *ev)
                 pad_xy_to_pitch_pressure((float)state.mouse_x / sapp_width(),
                                          (float)state.mouse_y / sapp_height());
             if (state.pad.pressure > 0.0) {
+                // mouse went down inside the pitch_pressure pad
                 note_on(state.pad.pitch, state.pad.pressure);
             }
             else {
+                // mouse down outside the pad, see if we are in keyboard
                 state.mouse_pitch =
                     xy_to_pitch((float)state.mouse_x / sapp_width(),
                                 (float)state.mouse_y / sapp_height());

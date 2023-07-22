@@ -97,7 +97,6 @@ void Synth::audio_cb(float *buffer, int num_frames, int num_channels)
 void Synth::note_on(float pitch, float amplitude)
 {
     osc_pitch_ = pitch;
-    // osc_.SetAmp(amplitude);
     set_env_sustain_level(amplitude);
     osc_.SetFreq(daisysp::mtof(pitch));
     if (!gate_) {

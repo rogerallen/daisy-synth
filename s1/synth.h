@@ -82,7 +82,7 @@ class Synth {
   private:
     bool gate_;
     daisysp::Oscillator osc_;
-    int osc_pitch_; // FIXME float pitch
+    float osc_pitch_;
     int osc_wave_;
     daisysp::Adsr env_;
     float env_attack_time_;
