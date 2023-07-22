@@ -14,7 +14,28 @@ void audio_cb(float *buffer, int num_frames, int num_channels);
 void note_on(float pitch, float amplitude);
 void note_off(void);
 int get_pitch(void);
+int get_wave(void);
 void set_wave(int wave);
+float get_env_attack_time();
+void set_env_attack_time(float v);
+float get_env_decay_time();
+void set_env_decay_time(float v);
+float get_env_sustain_level();
+void set_env_sustain_level(float v);
+float get_env_release_time();
+void set_env_release_time(float v);
+float get_flt_freq();
+void set_flt_freq(float v);
+float get_flt_res();
+void set_flt_res(float v);
+float get_verb_feedback();
+void set_verb_feedback(float v);
+float get_verb_lp_freq();
+void set_verb_lp_freq(float v);
+float get_verb_wet_factor();
+void set_verb_wet_factor(float v);
+float get_pan();
+void set_pan(float v);
 
 // keyboard
 int key_code_to_pitch(sapp_keycode kc);

@@ -10,21 +10,14 @@
   * `git clone --recursive https://github.com/cimgui/cimgui.git`
 
 # To Do
-* [x] get simplest synth example done
-* [x] refactor/encapsulate keyboard
-* [x] add mouse control of keyboard
-* [x] add mouse velocity+pitch xy control.
-* [x] add a "real" synth (see RogoSynth and RibbonTest)
-  * [x] stereo & panning
-  * [x] Adsr envelope
-  * [x] MoogLadder rlpf & control 
-  * [x] ReverbSc
-  * [x] Compressor
-  * [ ] fixup gui
 
 # Log
 
 Most recent on top.
+
+## Friday July 21, 2023
+
+Hooked up to GUI
 
 ## Thursday July 20, 2023
 

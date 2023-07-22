@@ -17,9 +17,20 @@
 static struct {
     sg_pass_action pass_action;
     sgl_pipeline pip_3d;
+
     float cur_amplitude;
-    int cur_wave;
     int next_wave;
+    float next_env_attack_time;
+    float next_env_decay_time;
+    float next_env_sustain_level;
+    float next_env_release_time;
+    float next_flt_freq;
+    float next_flt_res;
+    float next_verb_feedback;
+    float next_verb_lp_freq;
+    float next_verb_wet_factor;
+    float next_pan;
+
     sapp_event_type cur_event_type;
     bool mouse_down;
     int start_mouse_x, start_mouse_y;
@@ -70,8 +81,18 @@ static void init(void)
 
     // other state
     state.cur_amplitude = 0.5f;
-    state.cur_wave = 0;
-    state.next_wave = 0;
+    state.next_wave = get_wave();
+    state.next_env_attack_time = get_env_attack_time();
+    state.next_env_decay_time = get_env_decay_time();
+    state.next_env_sustain_level = get_env_sustain_level();
+    state.next_env_release_time = get_env_release_time();
+    state.next_flt_freq = get_flt_freq();
+    state.next_flt_res = get_flt_res();
+    state.next_verb_feedback = get_verb_feedback();
+    state.next_verb_lp_freq = get_verb_lp_freq();
+    state.next_verb_wet_factor = get_verb_wet_factor();
+    state.next_pan = get_pan();
+
     state.cur_event_type = 0;
     state.mouse_down = false;
     state.start_mouse_x = -1;
@@ -179,6 +200,26 @@ static void frame(void)
     igRadioButton_IntPtr("PB_SAW", &state.next_wave, 6);
     igSameLine(0.0f, -1.0f);
     igRadioButton_IntPtr("PB_SQUARE", &state.next_wave, 7);
+    igSliderFloat("EnvAttack", &state.next_env_attack_time, 0.0, 10.0, "%.3f",
+                  ImGuiSliderFlags_None);
+    igSliderFloat("EnvDecay", &state.next_env_decay_time, 0.0, 10.0, "%.3f",
+                  ImGuiSliderFlags_None);
+    igSliderFloat("EnvSustain", &state.next_env_sustain_level, 0.0, 1.0, "%.3f",
+                  ImGuiSliderFlags_None);
+    igSliderFloat("EnvRelease", &state.next_env_release_time, 0.0, 10.0, "%.3f",
+                  ImGuiSliderFlags_None);
+    igSliderFloat("FltFreq", &state.next_flt_freq, 10.0, 20000.0, "%.3f",
+                  ImGuiSliderFlags_None);
+    igSliderFloat("FltRes", &state.next_flt_res, 0.0, 1.0, "%.3f",
+                  ImGuiSliderFlags_None);
+    igSliderFloat("VerbFeedback", &state.next_verb_feedback, 0.0, 1.0, "%.3f",
+                  ImGuiSliderFlags_None);
+    igSliderFloat("VerbLPFreq", &state.next_verb_lp_freq, 10.0, 20000.0, "%.3f",
+                  ImGuiSliderFlags_None);
+    igSliderFloat("VerbWetFactor", &state.next_verb_wet_factor, 0.0, 1.0,
+                  "%.3f", ImGuiSliderFlags_None);
+    igSliderFloat("Pan", &state.next_pan, -1.0, 1.0, "%.3f",
+                  ImGuiSliderFlags_None);
 
     igEnd();
     /*=== UI CODE ENDS HERE ===*/
@@ -207,11 +248,41 @@ static void event(const sapp_event *ev)
 {
     state.cur_event_type = ev->type;
 
-    // handle wave radio box
-    if (state.next_wave != state.cur_wave) {
-        state.cur_wave = state.next_wave;
-        set_wave(state.cur_wave);
+    // handle synth updates
+    if (state.next_wave != get_wave()) {
+        set_wave(state.next_wave);
     }
+    if (state.next_env_attack_time != get_env_attack_time()) {
+        set_env_attack_time(state.next_env_attack_time);
+    }
+    if (state.next_env_decay_time != get_env_decay_time()) {
+        set_env_decay_time(state.next_env_decay_time);
+    }
+    if (state.next_env_sustain_level != get_env_sustain_level()) {
+        set_env_sustain_level(state.next_env_sustain_level);
+    }
+    if (state.next_env_release_time != get_env_release_time()) {
+        set_env_release_time(state.next_env_release_time);
+    }
+    if (state.next_flt_freq != get_flt_freq()) {
+        set_flt_freq(state.next_flt_freq);
+    }
+    if (state.next_flt_res != get_flt_res()) {
+        set_flt_res(state.next_flt_res);
+    }
+    if (state.next_verb_feedback != get_verb_feedback()) {
+        set_verb_feedback(state.next_verb_feedback);
+    }
+    if (state.next_verb_lp_freq != get_verb_lp_freq()) {
+        set_verb_lp_freq(state.next_verb_lp_freq);
+    }
+    if (state.next_verb_wet_factor != get_verb_wet_factor()) {
+        set_verb_wet_factor(state.next_verb_wet_factor);
+    }
+    if (state.next_pan != get_pan()) {
+        set_pan(state.next_pan);
+    }
+
     bool handled = simgui_handle_event(ev);
     // always handle key events
     if (ev->type == SAPP_EVENTTYPE_KEY_DOWN) {

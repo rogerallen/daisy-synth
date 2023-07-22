@@ -45,12 +45,32 @@ void audio_cb(float *buffer, int num_frames, int num_channels)
 void note_on(float pitch, float amplitude) { synth->note_on(pitch, amplitude); }
 void note_off() { synth->note_off(); }
 int get_pitch() { return synth->get_pitch(); }
+int get_wave(void) { return synth->get_wave(); }
 void set_wave(int wave) { synth->set_wave(wave); }
+float get_env_attack_time() { return synth->get_env_attack_time(); }
+void set_env_attack_time(float v) { synth->set_env_attack_time(v); }
+float get_env_decay_time() { return synth->get_env_decay_time(); }
+void set_env_decay_time(float v) { synth->set_env_decay_time(v); }
+float get_env_sustain_level() { return synth->get_env_sustain_level(); }
+void set_env_sustain_level(float v) { synth->set_env_sustain_level(v); }
+float get_env_release_time() { return synth->get_env_release_time(); }
+void set_env_release_time(float v) { synth->set_env_release_time(v); }
+float get_flt_freq() { return synth->get_flt_freq(); }
+void set_flt_freq(float v) { synth->set_flt_freq(v); }
+float get_flt_res() { return synth->get_flt_res(); }
+void set_flt_res(float v) { synth->set_flt_res(v); }
+float get_verb_feedback() { return synth->get_verb_feedback(); }
+void set_verb_feedback(float v) { synth->set_verb_feedback(v); }
+float get_verb_lp_freq() { return synth->get_verb_lp_freq(); }
+void set_verb_lp_freq(float v) { synth->set_verb_lp_freq(v); }
+float get_verb_wet_factor() { return synth->get_verb_wet_factor(); }
+void set_verb_wet_factor(float v) { synth->set_verb_wet_factor(v); }
+float get_pan() { return synth->get_pan(); }
+void set_pan(float v) { synth->set_pan(v); }
 
 // keyboard
 
 int xy_to_pitch(float x, float y) { return keyboard_piano->xy_to_pitch(x, y); }
-
 int key_code_to_pitch(sapp_keycode kc)
 {
     return keyboard_piano->key_code_to_pitch(kc);
